@@ -55,4 +55,5 @@ module.exports = merge(common, {
     path: path.resolve(__dirname, 'dist'),
     filename: 'scripts/[name].[contenthash:8].js',
     publicPath: '/ebilet/',
+  },
 }); 
