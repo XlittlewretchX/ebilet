@@ -29,4 +29,6 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
   }
 });
 
+router.patch('/city', auth, AuthController.updateCity);
+
 module.exports = router; 

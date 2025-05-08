@@ -71,6 +71,18 @@ export const uploadAvatar = createAsyncThunk(
   },
 );
 
+export const updateCity = createAsyncThunk(
+  'auth/updateCity',
+  async (city: string, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.updateCity(city);
+      return response.city;
+    } catch (err) {
+      return rejectWithValue('Ошибка при обновлении города');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -124,6 +136,11 @@ const authSlice = createSlice({
       .addCase(uploadAvatar.fulfilled, (state, action) => {
         if (state.user) {
           state.user.avatarUrl = action.payload.avatarUrl;
+        }
+      })
+      .addCase(updateCity.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.city = action.payload;
         }
       });
   },

@@ -44,6 +44,11 @@ export const authAPI = {
     });
     return response.data;
   },
+
+  updateCity: async (city: string) => {
+    const response = await api.patch('/auth/city', { city });
+    return response.data;
+  },
 };
 
 export const eventAPI = {

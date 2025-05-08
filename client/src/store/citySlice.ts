@@ -7,8 +7,8 @@ const initialState: CityState = {
 };
 
 /**
- * Thunk для получения города по IP через IPGeolocation.io
- * Возвращает название города или отклоняет с сообщением об ошибке.
+ * Thunk для получения города по IP через IPGeolocation.io,
+ * затем получения названия города на русском через Nominatim.
  */
 export const fetchCityByIP = createAsyncThunk<
   string, // возвращаемый тип
@@ -26,7 +26,29 @@ export const fetchCityByIP = createAsyncThunk<
       return rejectWithValue(`Ошибка API: ${response.status}`);
     }
     const data = await response.json();
-    return data.city || 'Город';
+    const { city, latitude, longitude } = data;
+    if (!latitude || !longitude) {
+      return city || 'Город';
+    }
+    // Второй запрос к Nominatim для получения города на русском
+    const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=ru`;
+    const nomRes = await fetch(nominatimUrl, {
+      headers: {
+        'User-Agent': 'ebilet-app/1.0 (your@email.com)'
+      }
+    });
+    if (nomRes.ok) {
+      const nomData = await nomRes.json();
+      // Варианты: city, town, village, state
+      const ruCity = nomData.address?.city || nomData.address?.town || nomData.address?.village || nomData.address?.state;
+      console.log(nomData.address.city);
+      console.log(nomData.address.suburb);
+      console.log(nomData.address.road);
+      console.log(nomData.address.house_number);
+      if (ruCity) return ruCity;
+    }
+    // Fallback: английское название
+    return city || 'Город';
   } catch (error) {
     return rejectWithValue((error as Error).message);
   }

@@ -46,6 +46,19 @@ class User {
       );
     });
   }
+
+  static async updateCity(userId, city) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE users SET city = ? WHERE id = ?',
+        [city, userId],
+        (err) => {
+          if (err) reject(err);
+          resolve();
+        }
+      );
+    });
+  }
 }
 
 module.exports = User; 

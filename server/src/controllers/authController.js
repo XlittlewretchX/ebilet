@@ -60,6 +60,21 @@ class AuthController {
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }
+
+  static async updateCity(req, res) {
+    try {
+      const userId = req.user.id;
+      const { city } = req.body;
+      if (!city) {
+        return res.status(400).json({ message: 'Город обязателен' });
+      }
+      await User.updateCity(userId, city);
+      res.json({ city });
+    } catch (error) {
+      console.error('Ошибка при обновлении города:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
 }
 
 module.exports = AuthController; 

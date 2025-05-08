@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { logout } from '@/store/authSlice';
+import { logout, updateCity } from '@/store/authSlice';
+import { fetchCityByIP, setCity } from '@/store/citySlice';
 import AuthModal from '@/components/AuthModal/AuthModal';
+import CityPicker from './CityPicker';
 import styles from './Header.module.scss';
 
 const Header: React.FC = () => {
@@ -12,6 +14,27 @@ const Header: React.FC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      dispatch(fetchCityByIP()).then((result: any) => {
+        if (fetchCityByIP.fulfilled.match(result)) {
+          dispatch(setCity(result.payload));
+        }
+      });
+    } else {
+      if (!user?.city || user.city === 'Город') {
+        dispatch(fetchCityByIP()).then((result: any) => {
+          if (fetchCityByIP.fulfilled.match(result)) {
+            dispatch(updateCity(result.payload));
+            dispatch(setCity(result.payload));
+          }
+        });
+      } else {
+        dispatch(setCity(user.city));
+      }
+    }
+  }, [isAuthenticated]);
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -54,6 +77,7 @@ const Header: React.FC = () => {
           />
         </div>
         <nav className={styles.nav}>
+          <CityPicker />
           {isAuthenticated ? (
             <>
               <Link to="/my-tickets" className={styles.link}>

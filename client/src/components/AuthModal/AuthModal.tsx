@@ -13,13 +13,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const { loading, error, isAuthenticated } = useAppSelector(
     (state) => state.auth,
   );
+  const city = useAppSelector((state) => state.city.name);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    city: '',
   });
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -39,7 +39,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       await dispatch(login(loginData));
     } else {
       const { confirmPassword, ...registerData } = formData;
-      const result = await dispatch(register(registerData));
+      const result = await dispatch(register({ ...registerData, city }));
       if (register.fulfilled.match(result)) {
         setSuccessMessage('Вы успешно зарегистрировались!');
         setTimeout(() => {
@@ -63,7 +63,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         email: '',
         password: '',
         confirmPassword: '',
-        city: '',
       });
       setSuccessMessage('');
     }
@@ -112,27 +111,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             />
           </div>
           {!isLogin && (
-            <>
-              <div className={styles.formGroup}>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Подтвердите пароль"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="Город"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-              </div>
-            </>
+            <div className={styles.formGroup}>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Подтвердите пароль"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
           )}
           <button type="submit" disabled={loading}>
             {loading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
