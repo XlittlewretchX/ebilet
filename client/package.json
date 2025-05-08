@@ -2,6 +2,7 @@
   "name": "ebilet-client",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://XlittlewretchX.github.io/ebilet",
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
     "@types/node": "^20.10.4",
