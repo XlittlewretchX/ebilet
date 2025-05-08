@@ -24,7 +24,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({ template: './public/index.html' }),
-    new Dotenv(),
+    new Dotenv({
+      path: process.env.NODE_ENV === 'production' ? './.env.production' : './.env',
+    }),
     new CopyPlugin({
       patterns: [
         { from: 'public/img', to: 'img' }
