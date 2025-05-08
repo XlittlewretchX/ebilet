@@ -18,7 +18,7 @@ const upload = multer({ storage });
 
 router.post('/', auth, upload.single('image'), EventController.create);
 router.get('/', EventController.getAll);
-router.get('/:id', EventController.getById);
 router.get('/user/events', auth, EventController.getByUserId);
+router.get('/:id', EventController.getById);
 
 module.exports = router; 

@@ -49,6 +49,7 @@ class EventController {
   }
 
   static async getByUserId(req, res) {
+    console.log('req.user:', req.user);
     try {
       const events = await Event.findByUserId(req.user.id);
       res.json(events);

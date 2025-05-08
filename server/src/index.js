@@ -63,6 +63,26 @@ db.serialize(() => {
   )`);
 });
 
+// Проверка и добавление столбца userId в таблицу events, если его нет
+// Это нужно делать после подключения к базе, до создания таблиц
+
+db.all("PRAGMA table_info(events);", (err, columns) => {
+  if (err) {
+    console.error('Ошибка при получении информации о столбцах:', err);
+    return;
+  }
+  const hasUserId = columns.some(col => col.name === 'userId');
+  if (!hasUserId) {
+    db.run("ALTER TABLE events ADD COLUMN userId INTEGER;", (err) => {
+      if (err) {
+        console.error('Ошибка при добавлении столбца userId:', err);
+      } else {
+        console.log('Столбец userId успешно добавлен в таблицу events');
+      }
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 }); 

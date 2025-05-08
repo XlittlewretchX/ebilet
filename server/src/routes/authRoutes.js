@@ -4,6 +4,7 @@ const AuthController = require('../controllers/authController');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
+const User = require('../models/User');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

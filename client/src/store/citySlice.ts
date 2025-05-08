@@ -41,10 +41,6 @@ export const fetchCityByIP = createAsyncThunk<
       const nomData = await nomRes.json();
       // Варианты: city, town, village, state
       const ruCity = nomData.address?.city || nomData.address?.town || nomData.address?.village || nomData.address?.state;
-      console.log(nomData.address.city);
-      console.log(nomData.address.suburb);
-      console.log(nomData.address.road);
-      console.log(nomData.address.house_number);
       if (ruCity) return ruCity;
     }
     // Fallback: английское название

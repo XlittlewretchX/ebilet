@@ -51,7 +51,13 @@ const ProfilePage: React.FC = () => {
         <div className={styles.profile}>
           <div className={styles.avatarSection}>
             <img
-              src={user.avatarUrl || '/default-avatar.png'}
+              src={
+                user.avatarUrl
+                  ? (user.avatarUrl.startsWith('/uploads')
+                      ? `${process.env.REACT_APP_API_URL?.replace('/api', '')}${user.avatarUrl}`
+                      : user.avatarUrl)
+                  : '/img/default-avatar.svg'
+              }
               alt="Avatar"
               className={styles.avatar}
             />
