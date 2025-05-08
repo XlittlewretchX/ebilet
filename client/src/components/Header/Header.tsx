@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/authSlice';
@@ -9,6 +9,7 @@ const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -24,6 +25,19 @@ const Header: React.FC = () => {
   const cancelLogout = () => {
     setShowLogoutConfirm(false);
   };
+
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const handleClick = (e: MouseEvent) => {
+      const menu = document.getElementById('user-menu-dropdown');
+      if (menu && !menu.contains(e.target as Node)) {
+        setShowUserMenu(false);
+        setShowLogoutConfirm(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showUserMenu]);
 
   return (
     <header className={styles.header}>
@@ -41,33 +55,70 @@ const Header: React.FC = () => {
         </div>
         <nav className={styles.nav}>
           {isAuthenticated ? (
-            <><Link to="/my-tickets" className={styles.link}>
-            Мои события
-          </Link>
-              <Link to="/profile" className={styles.link}>
-                Профиль
+            <>
+              <Link to="/my-tickets" className={styles.link}>
+                Мои события
               </Link>
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <button onClick={handleLogout} className={styles.button}>
-                  Выйти
+              <div className={styles.userMenuWrapper}>
+                <button
+                  className={styles.userMenuButton + (showUserMenu ? ' ' + styles.active : '')}
+                  onClick={() => {
+                    setShowUserMenu((v) => !v);
+                    setShowLogoutConfirm(false);
+                  }}
+                  aria-haspopup="true"
+                  aria-expanded={showUserMenu}
+                >
+                  <img
+                    src={user?.avatarUrl || '/default-avatar.png'}
+                    alt="avatar"
+                    className={styles.avatar}
+                  />
+                  <span className={styles.userName}>{user?.username}</span>
                 </button>
-                {showLogoutConfirm && (
-                  <div className={styles.logoutPopover}>
-                    <div>Выйти из аккаунта?</div>
-                    <div className={styles.logoutActions}>
+                {showUserMenu && (
+                  <div
+                    className={styles.menuDropdown}
+                    id="user-menu-dropdown"
+                  >
+                    <Link
+                      className={styles.menuItem}
+                      to="/profile"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Мой профиль
+                    </Link>
+                    <div className={styles.menuDivider} />
+                    {!showLogoutConfirm ? (
                       <button
-                        onClick={confirmLogout}
-                        className={styles.confirmBtn}
+                        className={styles.menuItem}
+                        onClick={() => setShowLogoutConfirm(true)}
                       >
-                        Да
+                        Выйти
                       </button>
-                      <button
-                        onClick={cancelLogout}
-                        className={styles.cancelBtn}
-                      >
-                        Нет
-                      </button>
-                    </div>
+                    ) : (
+                      <div className={styles.menuLogoutConfirm}>
+                        Выйти из аккаунта?
+                        <div className={styles.menuLogoutActions}>
+                          <button
+                            className={styles.menuConfirmBtn}
+                            onClick={() => {
+                              dispatch(logout());
+                              setShowLogoutConfirm(false);
+                              setShowUserMenu(false);
+                            }}
+                          >
+                            Да
+                          </button>
+                          <button
+                            className={styles.menuCancelBtn}
+                            onClick={() => setShowLogoutConfirm(false)}
+                          >
+                            Нет
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
