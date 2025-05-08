@@ -1,0 +1,32 @@
+const express = require('express');
+const router = express.Router();
+const AuthController = require('../controllers/authController');
+const auth = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage });
+
+router.post('/register', AuthController.register);
+router.post('/login', AuthController.login);
+router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
+  try {
+    const avatarUrl = `/uploads/${req.file.filename}`;
+    await User.updateAvatar(req.user.id, avatarUrl);
+    res.json({ avatarUrl });
+  } catch (error) {
+    console.error('Ошибка при загрузке аватара:', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+});
+
+module.exports = router; 
