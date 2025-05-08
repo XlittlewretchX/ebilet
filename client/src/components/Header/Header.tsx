@@ -40,11 +40,10 @@ const Header: React.FC = () => {
           />
         </div>
         <nav className={styles.nav}>
-          <Link to="/my-tickets" className={styles.link}>
+          {isAuthenticated ? (
+            <><Link to="/my-tickets" className={styles.link}>
             Мои события
           </Link>
-          {isAuthenticated ? (
-            <>
               <Link to="/profile" className={styles.link}>
                 Профиль
               </Link>
