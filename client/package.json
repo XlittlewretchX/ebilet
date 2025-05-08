@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "webpack serve --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx,scss,js,json}\"",
     "predeploy": "npm run build",
@@ -40,6 +40,7 @@
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^13.0.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.2",
     "dotenv-webpack": "^8.1.0",
