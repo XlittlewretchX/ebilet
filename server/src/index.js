@@ -9,8 +9,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = ['https://xlittlewretchx.github.io', 'http://localhost:3000'];
 app.use(cors({
-  origin: ['https://xlittlewretchx.github.io', 'http://localhost:3000'],
+  origin: allowedOrigins,
+  credentials: true
+}));
+app.options('*', cors({
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
