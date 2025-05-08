@@ -22,6 +22,9 @@ class AuthController {
       const user = await User.create({ username, email, password, city });
       const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
 
+      // Логирование для Render
+      console.log(`Новый пользователь зарегистрирован: ${username} (${email}), город: ${city}`);
+
       res.status(201).json({ token, user: { id: user.id, username: user.username, email: user.email, city: user.city } });
     } catch (error) {
       console.error('Ошибка при регистрации:', error);
@@ -42,6 +45,7 @@ class AuthController {
       if (!isValidPassword) {
         return res.status(400).json({ message: 'Неверный пароль' });
       }
+      console.log(`Пользователь вошел в систему: ${username}`);
 
       const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
 
