@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -41,6 +42,14 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: 'styles/[name].[contenthash:8].css',
       chunkFilename: 'styles/[id].[contenthash:8].css',
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, 'dist/index.html'), to: path.resolve(__dirname, 'dist/404.html'), noErrorOnMissing: true },
+      ],
+      options: {
+        concurrency: 100,
+      },
     }),
   ],
   optimization: {

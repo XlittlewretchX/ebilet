@@ -8,10 +8,12 @@ import ProfilePage from '@/pages/ProfilePage/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage';
 import styles from './App.module.scss';
 
+const basename = process.env.NODE_ENV === 'production' ? '/ebilet' : '';
+
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Router>
+      <Router basename={basename}>
         <div className={styles.app}>
           <Header />
           <main className={styles.main}>
