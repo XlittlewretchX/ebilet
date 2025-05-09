@@ -8,6 +8,7 @@ import styles from './HomePage.module.scss';
 const HomePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { events, loading, error } = useAppSelector((state) => state.event);
+  const search = useAppSelector((state) => state.search.value);
 
   useEffect(() => {
     dispatch(fetchEvents());
@@ -34,6 +35,23 @@ const HomePage: React.FC = () => {
   if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error) return <div className={styles.error}>Ошибка: {error}</div>;
 
+  // Фильтрация и сортировка событий по поисковому запросу
+  const normalizedSearch = search.trim().toLowerCase();
+  let filteredEvents = events;
+  if (normalizedSearch) {
+    const startsWith: any[] = [];
+    const contains: any[] = [];
+    for (const event of events) {
+      const title = event.title.toLowerCase();
+      if (title.startsWith(normalizedSearch)) {
+        startsWith.push(event);
+      } else if (title.includes(normalizedSearch)) {
+        contains.push(event);
+      }
+    }
+    filteredEvents = [...startsWith, ...contains];
+  }
+
   return (
     <div className={styles.homePage}>
       <div className={styles.content}>
@@ -42,7 +60,7 @@ const HomePage: React.FC = () => {
         </aside>
         <main className={styles.main}>
           <div className={styles.eventsGrid}>
-            {events.map((event: any) => (
+            {filteredEvents.map((event: any) => (
               <EventCard
                 key={event.id}
                 event={event}

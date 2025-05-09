@@ -6,6 +6,7 @@ import { fetchCityByIP, setCity } from '@/store/citySlice';
 import AuthModal from '@/components/AuthModal/AuthModal';
 import CityPicker from './CityPicker';
 import styles from './Header.module.scss';
+import { setSearch } from '@/store/searchSlice';
 
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -13,7 +14,7 @@ const Header: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [search, setSearch] = useState('');
+  const search = useAppSelector((state) => state.search.value);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -73,7 +74,7 @@ const Header: React.FC = () => {
             type="text"
             placeholder="Поиск мероприятий..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => dispatch(setSearch(e.target.value))}
           />
         </div>
         <nav className={styles.nav}>
