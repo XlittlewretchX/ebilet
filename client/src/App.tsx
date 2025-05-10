@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from '@/store/store';
-import Header from '@/components/Header/Header';
-import HomePage from '@/pages/HomePage/HomePage';
+import { store } from './app/store';
+import Header from '@/widgets/Header/Header';
+import HomePage from '@/pages/HomePage/ui/HomePage';
 import ProfilePage from '@/pages/ProfilePage/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage';
-import styles from './App.module.scss';
+import styles from './app/styles/App.module.scss';
 
 const basename = process.env.NODE_ENV === 'production' ? '/ebilet' : '';
 

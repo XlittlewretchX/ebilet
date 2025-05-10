@@ -32,7 +32,9 @@ app.use((err, req, res, next) => {
 });
 
 // Create uploads directory if it doesn't exist
+const testPath = path.join(__dirname, '../uploads/retroauto.png');
 const fs = require('fs');
+console.log('retroauto.png exists:', fs.existsSync(testPath), testPath);
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);

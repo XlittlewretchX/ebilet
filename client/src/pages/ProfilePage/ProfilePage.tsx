@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUserEvents } from '@/store/eventSlice';
-import { uploadAvatar } from '@/store/authSlice';
-import EventCard from '@/components/EventCard/EventCard';
+import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
+import { fetchUserEvents } from '@/entities/Event/model/eventSlice';
+import { uploadAvatar } from '@/features/AuthModal/model/authSlice';
+import EventCard from '@/entities/Event/ui/EventCard';
 import styles from './ProfilePage.module.scss';
+import type { Event } from '@/shared/types';
+import type { RootState } from '@/app/store';
 
 const ProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
-  const { events, loading, error } = useAppSelector((state) => state.event);
+  const { user } = useAppSelector((state: RootState) => state.auth);
+  const { events, loading, error } = useAppSelector((state: RootState) => state.event);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -132,7 +134,7 @@ const ProfilePage: React.FC = () => {
         <div className={styles.events}>
           <h3>Мои события</h3>
           <div className={styles.eventsGrid}>
-            {events.map((event) => (
+            {events.map((event: Event) => (
               <EventCard
                 key={event.id}
                 event={event}

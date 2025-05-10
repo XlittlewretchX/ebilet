@@ -15,7 +15,9 @@
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1",
     "sass": "^1.69.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "date-fns": "^4.1.0",
+    "react-datepicker": "^8.3.0"
   },
   "scripts": {
     "start": "webpack serve --config webpack.dev.js",
@@ -53,6 +55,7 @@
     "ts-loader": "^9.5.2",
     "webpack": "^5.99.8",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.1",
+    "@types/react-datepicker": "^6.2.0"
   }
 }
