@@ -40,6 +40,10 @@ class Event {
         const like = `%${filters.search}%`;
         params.push(like, like);
       }
+      if (filters.city) {
+        query += ' AND location LIKE ?';
+        params.push(`%${filters.city}%`);
+      }
 
       query += ' ORDER BY date DESC';
 

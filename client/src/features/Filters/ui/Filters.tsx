@@ -93,6 +93,20 @@ const Filters: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* Чекбокс "Искать в моем городе" */}
+      <div className={styles.section}>
+        <label className={styles.label} style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
+          <input
+            type="checkbox"
+            checked={filters.onlyMyCity}
+            onChange={e => handleChange('onlyMyCity', e.target.checked)}
+            style={{marginRight:'0.5rem'}}
+          />
+          Искать в моем городе
+        </label>
+      </div>
+
       <button
         className={styles.resetBtn}
         onClick={handleReset}

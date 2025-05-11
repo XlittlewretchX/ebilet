@@ -13,10 +13,17 @@ export const useHomePage = () => {
   const { filteredEvents } = useEventList();
   const [showLoader, setShowLoader] = useState(false);
   const search = useAppSelector((state) => state.search.value);
+  const city = useAppSelector((state) => state.city.name);
 
   useEffect(() => {
-    dispatch(fetchEvents({ ...debouncedFilters, search }));
-  }, [dispatch, debouncedFilters, search]);
+    const filtersToSend: any = { ...debouncedFilters, search };
+    if (debouncedFilters.onlyMyCity && city && city !== 'Город') {
+      filtersToSend.city = city;
+    } else {
+      delete filtersToSend.city;
+    }
+    dispatch(fetchEvents(filtersToSend));
+  }, [dispatch, debouncedFilters, search, city]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;

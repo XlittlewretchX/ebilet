@@ -11,6 +11,7 @@ export interface FilterState {
     min: number;
     max: number;
   };
+  onlyMyCity: boolean;
 }
 
 const initialState: FilterState = {
@@ -18,6 +19,7 @@ const initialState: FilterState = {
   subcategory: '',
   dateRange: { start: '', end: '' },
   priceRange: { min: 0, max: 10000 },
+  onlyMyCity: false,
 };
 
 const filterSlice = createSlice({

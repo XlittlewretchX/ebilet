@@ -53,7 +53,7 @@ export const authAPI = {
 };
 
 export const eventAPI = {
-  getAll: async (filters: Partial<FilterState> & { search?: string } = {}) => {
+  getAll: async (filters: Partial<FilterState> & { search?: string; city?: string } = {}) => {
     const params = new URLSearchParams();
     if (filters.category) params.append('category', filters.category);
     if (filters.subcategory) params.append('subcategory', filters.subcategory);
@@ -62,6 +62,7 @@ export const eventAPI = {
       if (filters.priceRange.max !== undefined) params.append('maxPrice', String(filters.priceRange.max));
     }
     if (filters.search) params.append('search', filters.search);
+    if (filters.city) params.append('city', filters.city);
     // Можно добавить другие фильтры по необходимости
     const response = await api.get('/events', { params });
     return response.data;

@@ -27,13 +27,14 @@ class EventController {
 
   static async getAll(req, res) {
     try {
-      const { category, subcategory, minPrice, maxPrice, search } = req.query;
+      const { category, subcategory, minPrice, maxPrice, search, city } = req.query;
       const filters = {
         category,
         subcategory,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
         search,
+        city,
       };
       const events = await Event.findAll(filters);
       res.json(events);
