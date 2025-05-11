@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { User, Event } from '../types';
+import type { FilterState } from '@/features/Filters/filterSlice';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -52,8 +53,17 @@ export const authAPI = {
 };
 
 export const eventAPI = {
-  getAll: async () => {
-    const response = await api.get('/events');
+  getAll: async (filters: Partial<FilterState> & { search?: string } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.category) params.append('category', filters.category);
+    if (filters.subcategory) params.append('subcategory', filters.subcategory);
+    if (filters.priceRange && typeof filters.priceRange === 'object') {
+      if (filters.priceRange.min !== undefined) params.append('minPrice', String(filters.priceRange.min));
+      if (filters.priceRange.max !== undefined) params.append('maxPrice', String(filters.priceRange.max));
+    }
+    if (filters.search) params.append('search', filters.search);
+    // Можно добавить другие фильтры по необходимости
+    const response = await api.get('/events', { params });
     return response.data;
   },
 

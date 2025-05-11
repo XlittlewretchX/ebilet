@@ -14,9 +14,36 @@ class Event {
     });
   }
 
-  static async findAll() {
+  static async findAll(filters = {}) {
     return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM events ORDER BY date DESC', (err, rows) => {
+      let query = 'SELECT * FROM events WHERE 1=1';
+      const params = [];
+
+      if (filters.category) {
+        query += ' AND category = ?';
+        params.push(filters.category);
+      }
+      if (filters.subcategory) {
+        query += ' AND subcategory = ?';
+        params.push(filters.subcategory);
+      }
+      if (filters.minPrice !== undefined) {
+        query += ' AND price >= ?';
+        params.push(filters.minPrice);
+      }
+      if (filters.maxPrice !== undefined) {
+        query += ' AND price <= ?';
+        params.push(filters.maxPrice);
+      }
+      if (filters.search) {
+        query += ' AND (title LIKE ? OR description LIKE ?)';
+        const like = `%${filters.search}%`;
+        params.push(like, like);
+      }
+
+      query += ' ORDER BY date DESC';
+
+      db.all(query, params, (err, rows) => {
         if (err) reject(err);
         resolve(rows);
       });

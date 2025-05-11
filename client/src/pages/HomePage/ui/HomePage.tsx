@@ -38,6 +38,8 @@ const HomePage: React.FC = () => {
             events={filteredEvents}
             onAddToFavorites={handleAddToFavorites}
             onBuyTicket={handleBuyTicket}
+            loading={loading}
+            error={error}
           />
         </main>
       </div>

@@ -27,7 +27,15 @@ class EventController {
 
   static async getAll(req, res) {
     try {
-      const events = await Event.findAll();
+      const { category, subcategory, minPrice, maxPrice, search } = req.query;
+      const filters = {
+        category,
+        subcategory,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        search,
+      };
+      const events = await Event.findAll(filters);
       res.json(events);
     } catch (error) {
       console.error('Ошибка при получении событий:', error);

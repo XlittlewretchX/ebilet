@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface FilterState {
   category: string;
+  subcategory: string;
   dateRange: {
     start: string;
     end: string;
@@ -14,6 +15,7 @@ export interface FilterState {
 
 const initialState: FilterState = {
   category: '',
+  subcategory: '',
   dateRange: { start: '', end: '' },
   priceRange: { min: 0, max: 10000 },
 };

@@ -3,18 +3,29 @@ import styles from './Filters.module.scss';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { setFilters, resetFilters } from '@/features/Filters/filterSlice';
 
+const subcategoriesMap: Record<string, string[]> = {
+  concert: ['рок', 'поп', 'классика', 'джаз'],
+  theater: ['драма', 'комедия', 'мюзикл'],
+  exhibition: ['искусство', 'наука', 'технологии'],
+  sport: ['футбол', 'баскетбол', 'теннис'],
+};
+
 const Filters: React.FC = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.filter);
 
   const handleChange = (field: keyof typeof filters, value: any) => {
-    const newFilters = { ...filters, [field]: value };
+    let newFilters = { ...filters, [field]: value };
+    // Если меняется категория, сбрасываем подкатегорию
+    if (field === 'category') {
+      newFilters = { ...newFilters, subcategory: '' };
+    }
     dispatch(setFilters(newFilters));
   };
 
   const handleReset = () => {
     dispatch(resetFilters());
-    window.dispatchEvent(new Event('reset-date-strip'));
+    //window.dispatchEvent(new Event('reset-date-strip'));
   };
 
   return (
@@ -35,6 +46,23 @@ const Filters: React.FC = () => {
           <option value="sport">Спорт</option>
         </select>
       </div>
+
+      {/* Подкатегория */}
+      {filters.category && subcategoriesMap[filters.category] && (
+        <div className={styles.section}>
+          <label className={styles.label}>Подкатегория</label>
+          <select
+            className={styles.select}
+            value={filters.subcategory}
+            onChange={(e) => handleChange('subcategory', e.target.value.toLowerCase())}
+          >
+            <option value="">Все подкатегории</option>
+            {subcategoriesMap[filters.category].map((subcat) => (
+              <option key={subcat} value={subcat}>{subcat.charAt(0).toUpperCase() + subcat.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className={styles.section}>
         <label className={styles.label}>Цена</label>

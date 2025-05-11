@@ -31,10 +31,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Что-то пошло не так!' });
 });
 
-// Create uploads directory if it doesn't exist
-const testPath = path.join(__dirname, '../uploads/retroauto.png');
 const fs = require('fs');
-console.log('retroauto.png exists:', fs.existsSync(testPath), testPath);
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
@@ -60,6 +57,7 @@ db.serialize(() => {
     price REAL NOT NULL,
     imageUrl TEXT,
     category TEXT,
+    subCategory TEXT,
     userId INTEGER,
     FOREIGN KEY (userId) REFERENCES users (id)
   )`);
@@ -83,6 +81,15 @@ db.all("PRAGMA table_info(events);", (err, columns) => {
       }
     });
   }
+});
+
+
+db.all("SELECT * FROM 'events' LIMIT 0,30", (err, rows) => {
+  if (err) {
+    console.error('Ошибка при получении данных:', err);
+    return;
+  }
+  console.log('Данные из таблицы events:', rows);
 });
 
 app.listen(PORT, () => {

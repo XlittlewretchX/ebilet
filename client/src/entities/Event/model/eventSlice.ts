@@ -8,8 +8,8 @@ const initialState: EventState = {
   error: null,
 };
 
-export const fetchEvents = createAsyncThunk('event/fetchEvents', async () => {
-  const response = await eventAPI.getAll();
+export const fetchEvents = createAsyncThunk('event/fetchEvents', async (filters: any = {}) => {
+  const response = await eventAPI.getAll(filters);
   return response;
 });
 
