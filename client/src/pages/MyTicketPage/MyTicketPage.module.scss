@@ -3,3 +3,68 @@
   margin: 2rem auto;
   padding: 1rem;
 }
+
+.tabs {
+  display: flex;
+  gap: 1.5rem;
+  margin: 2rem 0 1.5rem 0;
+}
+
+.tab, .activeTab {
+  padding: 0.7rem 2.2rem;
+  border: none;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #e3eaff;
+  color: #2563eb;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.activeTab {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+}
+
+.tab:hover:not(.activeTab) {
+  background: #d0dbf7;
+}
+
+.tabContent {
+  min-height: 260px;
+}
+
+.emptyStub {
+  grid-column: 1/-1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  min-height: 220px;
+  background: #f8faff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  animation: fadeIn 0.5s;
+}
+
+.emptyStubIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.emptyStubText {
+  color: #666;
+  font-size: 1.15rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: none; }
+}
