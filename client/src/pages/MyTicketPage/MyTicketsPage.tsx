@@ -3,6 +3,7 @@ import styles from './MyTicketPage.module.scss';
 import { useAppSelector, useAppDispatch } from '@/shared/lib/hooks';
 import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
 import { fetchFavorites } from '@/features/AuthModal/model/authSlice';
+import { fetchEvents } from '@/entities/Event/model/eventSlice';
 
 const TABS = [
   { key: 'tickets', label: 'Мои билеты' },
@@ -21,6 +22,7 @@ const MyTicketsPage: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'favorites') {
       dispatch(fetchFavorites());
+      dispatch(fetchEvents({}));
     }
   }, [activeTab, dispatch]);
 
