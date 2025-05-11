@@ -61,6 +61,15 @@ db.serialize(() => {
     userId INTEGER,
     FOREIGN KEY (userId) REFERENCES users (id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    eventId INTEGER NOT NULL,
+    UNIQUE(userId, eventId),
+    FOREIGN KEY (userId) REFERENCES users (id),
+    FOREIGN KEY (eventId) REFERENCES events (id)
+  )`);
 });
 
 // Проверка и добавление столбца userId в таблицу events, если его нет

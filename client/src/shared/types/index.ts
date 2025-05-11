@@ -4,6 +4,7 @@ export interface User {
   email: string;
   city: string;
   avatarUrl?: string;
+  favorites?: number[];
 }
 
 export interface Event {

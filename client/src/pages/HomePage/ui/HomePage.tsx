@@ -9,6 +9,9 @@ import Filters from '@/features/Filters/ui/Filters';
 import DateStrip from '@/features/DateStrip/DateStrip';
 import styles from '@/pages/HomePage/HomePage.module.scss';
 import { useHomePage } from '../model/useHomePage';
+import AuthModal from '@/features/AuthModal/ui/AuthModal';
+import AuthAlertModal from '@/shared/ui/AuthAlertModal';
+import { fetchFavorites } from '@/features/AuthModal/model/authSlice';
 
 const HomePage: React.FC = () => {
   const {
@@ -16,10 +19,23 @@ const HomePage: React.FC = () => {
     error,
     filteredEvents,
     handleAddToFavorites,
+    handleRemoveFromFavorites,
     handleBuyTicket,
     handleDateSelect,
     handleRangeSelect,
+    showAuthAlert,
+    setShowAuthAlert,
+    showAuthModal,
+    setShowAuthModal,
   } = useHomePage();
+
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchFavorites());
+    }
+  }, [isAuthenticated, dispatch]);
 
   if (loading) return <div className={styles.loading}>Загрузка...</div>;
   if (error) return <div className={styles.error}>Ошибка: {error}</div>;
@@ -37,12 +53,22 @@ const HomePage: React.FC = () => {
           <EventListWidget
             events={filteredEvents}
             onAddToFavorites={handleAddToFavorites}
+            onRemoveFromFavorites={handleRemoveFromFavorites}
             onBuyTicket={handleBuyTicket}
             loading={loading}
             error={error}
           />
         </main>
       </div>
+      <AuthAlertModal
+        isOpen={showAuthAlert}
+        onClose={() => setShowAuthAlert(false)}
+        onAuthClick={() => {
+          setShowAuthAlert(false);
+          setShowAuthModal(true);
+        }}
+      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 };

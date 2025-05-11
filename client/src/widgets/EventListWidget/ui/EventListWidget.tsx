@@ -6,6 +6,7 @@ import clsx from 'clsx';
 interface EventListWidgetProps {
   events: any[];
   onAddToFavorites: (id: number) => void;
+  onRemoveFromFavorites?: (id: number) => void;
   onBuyTicket: (id: number) => void;
   loading?: boolean;
   error?: string | null;
@@ -13,7 +14,7 @@ interface EventListWidgetProps {
 
 const SKELETON_COUNT = 6;
 
-const EventListWidget: React.FC<EventListWidgetProps> = ({ events, onAddToFavorites, onBuyTicket, loading, error }) => {
+const EventListWidget: React.FC<EventListWidgetProps> = ({ events, onAddToFavorites, onRemoveFromFavorites, onBuyTicket, loading, error }) => {
   if (loading) return (
     <div className={styles.eventsGrid}>
       {Array.from({ length: SKELETON_COUNT }).map((_, idx) => (
@@ -53,7 +54,9 @@ const EventListWidget: React.FC<EventListWidgetProps> = ({ events, onAddToFavori
         <EventCard
           key={event.id}
           event={event}
+          isFavorite={event.isFavorite}
           onAddToFavorites={onAddToFavorites}
+          onRemoveFromFavorites={onRemoveFromFavorites}
           onBuyTicket={onBuyTicket}
         />
       ))}

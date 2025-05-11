@@ -4,6 +4,7 @@ import { setFilters } from '@/features/Filters/filterSlice';
 import { useEffect, useState } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
 import { useDebounce } from '@/shared/lib/hooks';
+import { addFavorite, removeFavorite } from '@/features/AuthModal/model/authSlice';
 
 export const useHomePage = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +15,10 @@ export const useHomePage = () => {
   const [showLoader, setShowLoader] = useState(false);
   const search = useAppSelector((state) => state.search.value);
   const city = useAppSelector((state) => state.city.name);
+  const favorites = useAppSelector((state) => state.auth.user?.favorites || []);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     const filtersToSend: any = { ...debouncedFilters, search };
@@ -38,7 +43,15 @@ export const useHomePage = () => {
   }, [loading]);
 
   const handleAddToFavorites = (id: number) => {
-    // Логика добавления в избранное будет добавлена позже
+    if (!isAuthenticated) {
+      setShowAuthAlert(true);
+      return;
+    }
+    dispatch(addFavorite(id));
+  };
+
+  const handleRemoveFromFavorites = (id: number) => {
+    dispatch(removeFavorite(id));
   };
 
   const handleBuyTicket = (id: number) => {
@@ -63,13 +76,25 @@ export const useHomePage = () => {
     );
   };
 
+  // Обогащаем события флагом избранного
+  const eventsWithFavorite = filteredEvents.map(event => ({
+    ...event,
+    isFavorite: favorites.includes(event.id),
+  }));
+
   return {
     loading: showLoader,
     error,
-    filteredEvents,
+    filteredEvents: eventsWithFavorite,
     handleAddToFavorites,
+    handleRemoveFromFavorites,
     handleBuyTicket,
     handleDateSelect,
     handleRangeSelect,
+    showAuthAlert,
+    setShowAuthAlert,
+    showAuthModal,
+    setShowAuthModal,
+    isAuthenticated,
   };
 }; 

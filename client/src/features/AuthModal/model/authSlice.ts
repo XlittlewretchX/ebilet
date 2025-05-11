@@ -83,6 +83,42 @@ export const updateCity = createAsyncThunk(
   }
 );
 
+export const addFavorite = createAsyncThunk(
+  'auth/addFavorite',
+  async (eventId: number, { rejectWithValue }) => {
+    try {
+      await authAPI.addFavorite(eventId);
+      return eventId;
+    } catch (err) {
+      return rejectWithValue('Ошибка при добавлении в избранное');
+    }
+  }
+);
+
+export const removeFavorite = createAsyncThunk(
+  'auth/removeFavorite',
+  async (eventId: number, { rejectWithValue }) => {
+    try {
+      await authAPI.removeFavorite(eventId);
+      return eventId;
+    } catch (err) {
+      return rejectWithValue('Ошибка при удалении из избранного');
+    }
+  }
+);
+
+export const fetchFavorites = createAsyncThunk(
+  'auth/fetchFavorites',
+  async (_, { rejectWithValue }) => {
+    try {
+      const favorites = await authAPI.getFavorites();
+      return favorites;
+    } catch (err) {
+      return rejectWithValue('Ошибка при получении избранного');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -141,6 +177,24 @@ const authSlice = createSlice({
       .addCase(updateCity.fulfilled, (state, action) => {
         if (state.user) {
           state.user.city = action.payload;
+        }
+      })
+      .addCase(addFavorite.fulfilled, (state, action) => {
+        if (state.user) {
+          if (!state.user.favorites) state.user.favorites = [];
+          if (!state.user.favorites.includes(action.payload)) {
+            state.user.favorites.push(action.payload);
+          }
+        }
+      })
+      .addCase(removeFavorite.fulfilled, (state, action) => {
+        if (state.user && state.user.favorites) {
+          state.user.favorites = state.user.favorites.filter(id => id !== action.payload);
+        }
+      })
+      .addCase(fetchFavorites.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.favorites = action.payload.map((event: any) => event.id);
         }
       });
   },

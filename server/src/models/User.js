@@ -59,6 +59,45 @@ class User {
       );
     });
   }
+
+  static async addFavorite(userId, eventId) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'INSERT OR IGNORE INTO favorites (userId, eventId) VALUES (?, ?)',
+        [userId, eventId],
+        function(err) {
+          if (err) reject(err);
+          resolve();
+        }
+      );
+    });
+  }
+
+  static async removeFavorite(userId, eventId) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM favorites WHERE userId = ? AND eventId = ?',
+        [userId, eventId],
+        function(err) {
+          if (err) reject(err);
+          resolve();
+        }
+      );
+    });
+  }
+
+  static async getFavorites(userId) {
+    return new Promise((resolve, reject) => {
+      db.all(
+        'SELECT events.* FROM events JOIN favorites ON events.id = favorites.eventId WHERE favorites.userId = ? ORDER BY events.date DESC',
+        [userId],
+        (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        }
+      );
+    });
+  }
 }
 
 module.exports = User; 

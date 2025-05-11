@@ -79,6 +79,47 @@ class AuthController {
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }
+
+  static async addFavorite(req, res) {
+    try {
+      const userId = req.user.id;
+      const { eventId } = req.body;
+      if (!eventId) {
+        return res.status(400).json({ message: 'eventId обязателен' });
+      }
+      await User.addFavorite(userId, eventId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Ошибка при добавлении в избранное:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async removeFavorite(req, res) {
+    try {
+      const userId = req.user.id;
+      const { eventId } = req.body;
+      if (!eventId) {
+        return res.status(400).json({ message: 'eventId обязателен' });
+      }
+      await User.removeFavorite(userId, eventId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Ошибка при удалении из избранного:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async getFavorites(req, res) {
+    try {
+      const userId = req.user.id;
+      const favorites = await User.getFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error('Ошибка при получении избранного:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
 }
 
 module.exports = AuthController; 

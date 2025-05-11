@@ -50,6 +50,21 @@ export const authAPI = {
     const response = await api.patch('/auth/city', { city });
     return response.data;
   },
+
+  addFavorite: async (eventId: number) => {
+    const response = await api.post('/auth/favorite', { eventId });
+    return response.data;
+  },
+
+  removeFavorite: async (eventId: number) => {
+    const response = await api.delete('/auth/favorite', { data: { eventId } });
+    return response.data;
+  },
+
+  getFavorites: async () => {
+    const response = await api.get('/auth/favorites');
+    return response.data;
+  },
 };
 
 export const eventAPI = {

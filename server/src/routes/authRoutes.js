@@ -32,4 +32,8 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
 
 router.patch('/city', auth, AuthController.updateCity);
 
+router.post('/favorite', auth, AuthController.addFavorite);
+router.delete('/favorite', auth, AuthController.removeFavorite);
+router.get('/favorites', auth, AuthController.getFavorites);
+
 module.exports = router; 

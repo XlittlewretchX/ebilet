@@ -100,7 +100,7 @@ const ProfilePage: React.FC = () => {
               <div className={styles.statLabel}>Куплено билетов</div>
             </div>
             <div className={styles.statItem}>
-              <div className={styles.statValue}>0</div>
+              <div className={styles.statValue}>{user.favorites ? user.favorites.length : 0}</div>
               <div className={styles.statLabel}>Избранное</div>
             </div>
           </div>

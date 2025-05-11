@@ -4,13 +4,17 @@ import styles from './EventCard.module.scss';
 
 interface EventCardProps {
   event: Event;
+  isFavorite?: boolean;
   onAddToFavorites: (id: number) => void;
+  onRemoveFromFavorites?: (id: number) => void;
   onBuyTicket: (id: number) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
   event,
+  isFavorite,
   onAddToFavorites,
+  onRemoveFromFavorites,
   onBuyTicket,
 }) => {
   const formatDate = (dateString: string) => {
@@ -43,12 +47,22 @@ const EventCard: React.FC<EventCardProps> = ({
           <span className={styles.price}>{event.price} ₽</span>
         </div>
         <div className={styles.actions}>
-          <button
-            className={styles.favoriteButton}
-            onClick={() => onAddToFavorites(event.id)}
-          >
-            В избранное
-          </button>
+          {isFavorite ? (
+            <button
+              className={styles.favoriteButton}
+              style={{ color: '#2563eb', fontWeight: 700 }}
+              onClick={() => onRemoveFromFavorites && onRemoveFromFavorites(event.id)}
+            >
+              В избранном
+            </button>
+          ) : (
+            <button
+              className={styles.favoriteButton}
+              onClick={() => onAddToFavorites(event.id)}
+            >
+              В избранное
+            </button>
+          )}
           <button
             className={styles.buyButton}
             onClick={() => onBuyTicket(event.id)}
