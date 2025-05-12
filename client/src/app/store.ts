@@ -4,6 +4,7 @@ import eventReducer from '@/entities/Event/model/eventSlice';
 import cityReducer from '@/features/ChangeCity/model/citySlice';
 import searchReducer from '@/features/SearchBar/model/searchSlice';
 import filterReducer from '@/features/Filters/filterSlice';
+import mobileMenuReducer from '@/features/MobileMenu/model/mobileMenuSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     city: cityReducer,
     search: searchReducer,
     filter: filterReducer,
+    mobileMenu: mobileMenuReducer,
   },
 });
 

@@ -14,8 +14,35 @@
     font-size: 1rem;
     transition: border-color 0.2s;
     outline: none;
+
+    &::placeholder {
+      color: #999;
+    }
   }
+
   input:focus {
     border-color: #007bff;
+  }
+}
+
+@media (max-width: 768px) {
+  .searchBar {
+    margin: 0 1rem;
+    
+    input {
+      max-width: 200px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .searchBar {
+    margin: 0 0.5rem;
+    
+    input {
+      max-width: 150px;
+      font-size: 0.875rem;
+      padding: 0.4rem 0.75rem;
+    }
   }
 } 

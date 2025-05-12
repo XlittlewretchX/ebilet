@@ -309,6 +309,7 @@
   outline: none;
   transition: border-color 0.2s;
 }
+
 .cityInput:focus {
   border-color: #007bff;
 }
@@ -317,4 +318,37 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .cityPicker {
+    margin-right: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cityPicker {
+    margin-right: 0.5rem;
+  }
+
+  .cityName {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+  }
+
+  .cityButton {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .cityModal {
+    min-width: 280px;
+    padding: 1rem 1.5rem;
+  }
+
+  .cityInput {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.75rem;
+  }
 }

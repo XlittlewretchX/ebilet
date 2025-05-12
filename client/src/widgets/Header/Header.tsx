@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { logout, updateCity } from '@/features/AuthModal/model/authSlice';
+import { updateCity } from '@/features/AuthModal/model/authSlice';
 import { fetchCityByIP, setCity } from '@/features/ChangeCity/model/citySlice';
 import AuthModal from '@/features/AuthModal/ui/AuthModal';
 import CityPicker from '@/features/ChangeCity/ui/CityPicker';
 import UserMenu from '@/features/UserMenu/ui/UserMenu';
+import { MobileMenu } from '@/features/MobileMenu/ui/MobileMenu';
+import { openMenu } from '@/features/MobileMenu/model/mobileMenuSlice';
 import styles from '@/widgets/Header/Header.module.scss';
-import { setSearch } from '@/features/SearchBar/model/searchSlice';
 import SearchBar from '@/features/SearchBar/ui/SearchBar';
+import { MobileMenuIcon } from '@/shared/ui/icons';
 import type { RootState } from '@/app/store';
 
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((state: RootState) => state.auth);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const search = useAppSelector((state: RootState) => state.search.value);
+  const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -69,7 +70,18 @@ const Header: React.FC = () => {
             </button>
           )}
         </nav>
+        <button
+          className={styles.mobileMenuButton}
+          onClick={() => dispatch(openMenu())}
+          aria-label="Открыть меню"
+        >
+          <MobileMenuIcon />
+        </button>
       </div>
+      <MobileMenu
+        isAuthenticated={isAuthenticated}
+        onLoginClick={() => setIsAuthModalOpen(true)}
+      />
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
