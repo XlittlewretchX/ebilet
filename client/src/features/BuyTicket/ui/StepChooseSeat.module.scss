@@ -3,6 +3,7 @@
   gap: 16px;
   margin-bottom: 16px;
   align-items: center;
+  justify-content: center;
 }
 .legendItem {
   display: flex;
@@ -47,7 +48,7 @@
   justify-content: center;
   min-width: 320px;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0 auto 20px;
 }
 .gridRow {
   display: flex;
@@ -63,18 +64,25 @@
   color: #222;
   font-weight: 400;
   transition: all 0.15s;
-}
-.seatButton.selected {
-  background: #2563eb;
-  color: #fff;
-  border: 2px solid #2563eb;
-  font-weight: 700;
-  box-shadow: 0 0 8px #2563eb55;
-}
-.seatButton.booked {
-  background: #ccc;
-  color: #888;
-  cursor: not-allowed;
+
+  &.selected {
+    background: #2563eb;
+    color: #fff;
+    border: 2px solid #2563eb;
+    font-weight: 700;
+    box-shadow: 0 0 8px #2563eb55;
+  }
+
+  &.booked {
+    background: #ccc;
+    color: #888;
+    cursor: not-allowed;
+  }
+
+  &:not(.booked):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px #2563eb22;
+  }
 }
 .circleWrapper {
   display: flex;
@@ -124,8 +132,10 @@
 .selectedInfo {
   margin-top: 12px;
   color: #2563eb;
+  text-align: center;
 }
 .maxInfo {
   color: orange;
   margin-top: 8px;
+  text-align: center;
 } 

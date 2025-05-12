@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './StepChooseCount.module.scss';
 import { useChooseCount, MAX_COUNT } from '../model/useChooseCount';
+import StepContainer from './common/StepContainer';
+import StepButtons from './common/StepButtons';
 
 interface StepChooseCountProps {
   onNext: (count: number) => void;
@@ -12,8 +14,7 @@ const StepChooseCount: React.FC<StepChooseCountProps> = ({ onNext, onBack, initi
   const { count, decrement, increment, setCount } = useChooseCount(initialCount);
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Выбор количества билетов</h2>
+    <StepContainer title="Выбор количества билетов">
       <div className={styles.counterRow}>
         <button
           onClick={decrement}
@@ -37,20 +38,12 @@ const StepChooseCount: React.FC<StepChooseCountProps> = ({ onNext, onBack, initi
           aria-label="Увеличить количество"
         >+</button>
       </div>
-      <div style={{display:'flex', gap:8, marginTop:8}}>
-        {onBack && (
-          <button 
-            onClick={onBack} 
-            className={styles.prevButton}
-          >Назад</button>
-        )}
-        <button
-          onClick={() => onNext(count)}
-          className={styles.nextButton}
-        >Далее</button>
-      </div>
       <div className={styles.hint}>Максимум {MAX_COUNT} билетов за одну покупку</div>
-    </div>
+      <StepButtons
+        onNext={() => onNext(count)}
+        onBack={onBack}
+      />
+    </StepContainer>
   );
 };
 

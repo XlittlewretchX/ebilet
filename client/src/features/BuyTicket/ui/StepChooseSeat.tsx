@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './StepChooseSeat.module.scss';
 import { useChooseSeat, MAX_SELECT } from '../model/useChooseSeat';
+import StepContainer from './common/StepContainer';
+import StepButtons from './common/StepButtons';
 
 interface StepChooseSeatProps {
   eventId: string;
@@ -40,8 +42,7 @@ const StepChooseSeat: React.FC<StepChooseSeatProps> = ({ eventId, onNext, onBack
   if (error) return <div style={{color:'red'}}>{error}</div>;
 
   return (
-    <div>
-      <h2>Выбор мест</h2>
+    <StepContainer title="Выбор мест">
       {/* Легенда */}
       <div className={styles.legend}>
         <span className={styles.legendItem}>
@@ -152,15 +153,14 @@ const StepChooseSeat: React.FC<StepChooseSeatProps> = ({ eventId, onNext, onBack
           </svg>
         </div>
       )}
-      <div style={{marginTop:20, display:'flex', gap:8}}>
-        {onBack && (
-          <button onClick={onBack} className={styles.prevButton}>Назад</button>
-        )}
-        <button onClick={handleNext} disabled={selectedSeats.length === 0} className={styles.nextButton}>Далее</button>
-      </div>
       {selectedSeats.length > 0 && <div className={styles.selectedInfo}>Вы выбрали места: <b>{selectedSeats.join(', ')}</b></div>}
       {selectedSeats.length === MAX_SELECT && <div className={styles.maxInfo}>Максимум {MAX_SELECT} мест за одну покупку</div>}
-    </div>
+      <StepButtons
+        onNext={handleNext}
+        onBack={onBack}
+        isNextDisabled={selectedSeats.length === 0}
+      />
+    </StepContainer>
   );
 };
 
