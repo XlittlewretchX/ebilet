@@ -1,14 +1,14 @@
 const db = require('../config/database');
 
 class Event {
-  static async create({ title, description, date, location, price, imageUrl, category, userId }) {
+  static async create({ title, description, date, location, price, imageUrl, category, userId, seatingType }) {
     return new Promise((resolve, reject) => {
       db.run(
-        'INSERT INTO events (title, description, date, location, price, imageUrl, category, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [title, description, date, location, price, imageUrl, category, userId],
+        'INSERT INTO events (title, description, date, location, price, imageUrl, category, userId, seatingType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [title, description, date, location, price, imageUrl, category, userId, seatingType || 'none'],
         function(err) {
           if (err) reject(err);
-          resolve({ id: this.lastID, title, description, date, location, price, imageUrl, category, userId });
+          resolve({ id: this.lastID, title, description, date, location, price, imageUrl, category, userId, seatingType: seatingType || 'none' });
         }
       );
     });

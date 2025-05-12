@@ -58,6 +58,7 @@ db.serialize(() => {
     imageUrl TEXT,
     category TEXT,
     subCategory TEXT,
+    seatingType TEXT DEFAULT 'none',
     userId INTEGER,
     FOREIGN KEY (userId) REFERENCES users (id)
   )`);
@@ -69,6 +70,20 @@ db.serialize(() => {
     UNIQUE(userId, eventId),
     FOREIGN KEY (userId) REFERENCES users (id),
     FOREIGN KEY (eventId) REFERENCES events (id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    eventId INTEGER NOT NULL,
+    seat TEXT,
+    name TEXT,
+    phone TEXT,
+    email TEXT,
+    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES users (id),
+    FOREIGN KEY (eventId) REFERENCES events (id),
+    UNIQUE(eventId, seat)
   )`);
 });
 
@@ -92,6 +107,52 @@ db.all("PRAGMA table_info(events);", (err, columns) => {
   }
 });
 
+// Миграция: добавление столбца seatingType, если его нет
+db.all("PRAGMA table_info(events);", (err, columns) => {
+  if (err) {
+    console.error('Ошибка при получении информации о столбцах:', err);
+    return;
+  }
+  const hasSeatingType = columns.some(col => col.name === 'seatingType');
+  if (!hasSeatingType) {
+    db.run("ALTER TABLE events ADD COLUMN seatingType TEXT DEFAULT 'none';", (err) => {
+      if (err) {
+        console.error('Ошибка при добавлении столбца seatingType:', err);
+      } else {
+        console.log('Столбец seatingType успешно добавлен в таблицу events');
+      }
+    });
+  }
+});
+
+// Миграция: добавление новых столбцов, если их нет
+const ticketColumns = [
+  { name: 'seat', type: 'TEXT' },
+  { name: 'name', type: 'TEXT' },
+  { name: 'phone', type: 'TEXT' },
+  { name: 'email', type: 'TEXT' },
+];
+db.all("PRAGMA table_info(tickets);", (err, columns) => {
+  if (err) {
+    console.error('Ошибка при получении информации о столбцах tickets:', err);
+    return;
+  }
+  ticketColumns.forEach(col => {
+    const hasCol = columns.some(c => c.name === col.name);
+    if (!hasCol) {
+      db.run(`ALTER TABLE tickets ADD COLUMN ${col.name} ${col.type};`, (err) => {
+        if (err) {
+          console.error(`Ошибка при добавлении столбца ${col.name} в tickets:`, err);
+        } else {
+          console.log(`Столбец ${col.name} успешно добавлен в tickets`);
+        }
+      });
+    }
+  });
+});
+
+// Миграция: добавление уникального индекса на (eventId, seat)
+db.run('CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_event_seat ON tickets(eventId, seat)');
 
 db.all("SELECT * FROM 'events' LIMIT 0,30", (err, rows) => {
   if (err) {

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Ticket = require('../models/Ticket');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -117,6 +118,35 @@ class AuthController {
       res.json(favorites);
     } catch (error) {
       console.error('Ошибка при получении избранного:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async buyTicket(req, res) {
+    try {
+      const userId = req.user.id;
+      const { eventId, seat, name, phone, email } = req.body;
+      if (!eventId) {
+        return res.status(400).json({ message: 'eventId обязателен' });
+      }
+      const ticket = await Ticket.buy(userId, eventId, seat, name, phone, email);
+      res.json(ticket);
+    } catch (error) {
+      if (error.message && error.message.includes('Место')) {
+        return res.status(409).json({ message: error.message });
+      }
+      console.error('Ошибка при покупке билета:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async getUserTickets(req, res) {
+    try {
+      const userId = req.user.id;
+      const tickets = await Ticket.getByUser(userId);
+      res.json(tickets);
+    } catch (error) {
+      console.error('Ошибка при получении билетов пользователя:', error);
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }

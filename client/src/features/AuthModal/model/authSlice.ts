@@ -8,6 +8,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  userTickets: [],
 };
 
 export const register = createAsyncThunk(
@@ -119,6 +120,33 @@ export const fetchFavorites = createAsyncThunk(
   }
 );
 
+export const buyTicket = createAsyncThunk(
+  'auth/buyTicket',
+  async (
+    data: { eventId: number; seat?: string | string[] | null; name: string; phone: string; email: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const ticket = await authAPI.buyTicket(data);
+      return ticket;
+    } catch (err) {
+      return rejectWithValue('Ошибка при покупке билета');
+    }
+  }
+);
+
+export const fetchUserTickets = createAsyncThunk(
+  'auth/fetchUserTickets',
+  async (_, { rejectWithValue }) => {
+    try {
+      const tickets = await authAPI.getUserTickets();
+      return tickets;
+    } catch (err) {
+      return rejectWithValue('Ошибка при получении билетов');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -196,6 +224,30 @@ const authSlice = createSlice({
         if (state.user) {
           state.user.favorites = action.payload.map((event: any) => event.id);
         }
+      })
+      .addCase(buyTicket.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(buyTicket.fulfilled, (state, action) => {
+        state.loading = false;
+        // Можно добавить ticket в отдельный state.tickets, если потребуется
+      })
+      .addCase(buyTicket.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || 'Ошибка при покупке билета';
+      })
+      .addCase(fetchUserTickets.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserTickets.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userTickets = action.payload;
+      })
+      .addCase(fetchUserTickets.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || 'Ошибка при получении билетов';
       });
   },
 });

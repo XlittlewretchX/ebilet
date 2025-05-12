@@ -20,6 +20,7 @@ const ProfilePage: React.FC = () => {
     email: user?.email || '',
     city: user?.city || '',
   });
+  const userTickets = useAppSelector((state: RootState) => state.auth.userTickets || []);
 
   useEffect(() => {
     if (user) {
@@ -96,7 +97,7 @@ const ProfilePage: React.FC = () => {
           </div>
           <div className={styles.stats}>
             <div className={styles.statItem}>
-              <div className={styles.statValue}>0</div>
+              <div className={styles.statValue}>{userTickets.length}</div>
               <div className={styles.statLabel}>Куплено билетов</div>
             </div>
             <div className={styles.statItem}>

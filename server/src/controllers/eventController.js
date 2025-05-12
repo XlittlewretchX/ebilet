@@ -1,9 +1,10 @@
 const Event = require('../models/Event');
+const Ticket = require('../models/Ticket');
 
 class EventController {
   static async create(req, res) {
     try {
-      const { title, description, date, location, price, category } = req.body;
+      const { title, description, date, location, price, category, seatingType } = req.body;
       const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
       const userId = req.user.id;
 
@@ -15,7 +16,8 @@ class EventController {
         price,
         imageUrl,
         category,
-        userId
+        userId,
+        seatingType
       });
 
       res.status(201).json(event);
@@ -64,6 +66,16 @@ class EventController {
       res.json(events);
     } catch (error) {
       console.error('Ошибка при получении событий пользователя:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async getBookedSeats(req, res) {
+    try {
+      const { eventId } = req.params;
+      const seats = await Ticket.getBookedSeats(eventId);
+      res.json(seats);
+    } catch (error) {
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }

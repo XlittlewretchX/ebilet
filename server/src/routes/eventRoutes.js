@@ -20,5 +20,6 @@ router.post('/', auth, upload.single('image'), EventController.create);
 router.get('/', EventController.getAll);
 router.get('/user/events', auth, EventController.getByUserId);
 router.get('/:id', EventController.getById);
+router.get('/:eventId/booked-seats', EventController.getBookedSeats);
 
 module.exports = router; 

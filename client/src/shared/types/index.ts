@@ -19,12 +19,29 @@ export interface Event {
   userId: number;
 }
 
+export interface Ticket {
+  id: number;
+  userId: number;
+  eventId: number;
+  seat?: string | null;
+  name?: string;
+  phone?: string;
+  email?: string;
+  createdAt: string;
+  title: string;
+  date: string;
+  location: string;
+  price: number;
+  imageUrl?: string;
+}
+
 export interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  userTickets?: Ticket[];
 }
 
 export interface EventState {

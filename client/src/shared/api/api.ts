@@ -65,6 +65,16 @@ export const authAPI = {
     const response = await api.get('/auth/favorites');
     return response.data;
   },
+
+  buyTicket: async (data: { eventId: number; seat?: string | string[] | null; name: string; phone: string; email: string }) => {
+    const response = await api.post('/auth/buy-ticket', data);
+    return response.data;
+  },
+
+  getUserTickets: async () => {
+    const response = await api.get('/auth/my-tickets');
+    return response.data;
+  },
 };
 
 export const eventAPI = {
@@ -99,6 +109,11 @@ export const eventAPI = {
 
   getUserEvents: async () => {
     const response = await api.get('/events/user/events');
+    return response.data;
+  },
+
+  getBookedSeats: async (eventId: number) => {
+    const response = await api.get(`/events/${eventId}/booked-seats`);
     return response.data;
   },
 };

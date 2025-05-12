@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
 import { useDebounce } from '@/shared/lib/hooks';
 import { addFavorite, removeFavorite } from '@/features/AuthModal/model/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 export const useHomePage = () => {
   const dispatch = useAppDispatch();
@@ -54,8 +55,10 @@ export const useHomePage = () => {
     dispatch(removeFavorite(id));
   };
 
+  const navigate = useNavigate();
+
   const handleBuyTicket = (id: number) => {
-    // Логика покупки билета будет добавлена позже
+    navigate(`/buy/${id}`);
   };
 
   const handleDateSelect = (date: string) => {

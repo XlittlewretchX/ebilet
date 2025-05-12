@@ -36,4 +36,7 @@ router.post('/favorite', auth, AuthController.addFavorite);
 router.delete('/favorite', auth, AuthController.removeFavorite);
 router.get('/favorites', auth, AuthController.getFavorites);
 
+router.post('/buy-ticket', auth, AuthController.buyTicket);
+router.get('/my-tickets', auth, AuthController.getUserTickets);
+
 module.exports = router; 
