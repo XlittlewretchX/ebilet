@@ -48,7 +48,7 @@ const Header: React.FC = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
-          EBilet
+          eBilet
         </Link>
         <SearchBar />
         <nav className={styles.nav}>
