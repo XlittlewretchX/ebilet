@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
 import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
 import Filters from '@/features/Filters/ui/Filters';
-import DateStrip from '@/features/DateStrip/DateStrip';
+import DateStrip from '@/features/DateStrip/ui/DateStrip';
 import styles from '@/pages/HomePage/HomePage.module.scss';
 import { useHomePage } from '../model/useHomePage';
 import AuthModal from '@/features/AuthModal/ui/AuthModal';
