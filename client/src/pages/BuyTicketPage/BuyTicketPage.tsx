@@ -11,20 +11,28 @@ import StepSuccess from '@/features/BuyTicket/ui/StepSuccess';
 import StepChooseCount from '@/features/BuyTicket/ui/StepChooseCount';
 import Toast from '@/shared/ui/Toast';
 
+interface FormData {
+  count: number;
+  seat: string[] | string | null;
+  userData: { name: string; phone: string; email: string } | null;
+}
+
 const BuyTicketPage: React.FC = () => {
   const { eventId = '' } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userEmail = useSelector((state: RootState) => state.auth.user?.email || '');
   const [step, setStep] = useState(0);
-  const [seat, setSeat] = useState<string[] | string | null>(null);
-  const [userData, setUserData] = useState<{ name: string; phone: string; email: string } | null>(null);
+  const [formData, setFormData] = useState<FormData>({
+    count: 1,
+    seat: null,
+    userData: null
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [event, setEvent] = useState<any>(null);
   const [eventLoading, setEventLoading] = useState(true);
   const [eventError, setEventError] = useState<string | null>(null);
-  const [count, setCount] = useState<number>(1);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   useEffect(() => {
@@ -41,6 +49,11 @@ const BuyTicketPage: React.FC = () => {
     setStep(step + 1);
   };
 
+  const prevStep = () => {
+    setError(null);
+    setStep(step - 1);
+  };
+
   if (eventLoading) return <div>Загрузка события...</div>;
   if (eventError || !event) return <div style={{color:'red'}}>{eventError || 'Событие не найдено'}</div>;
 
@@ -52,9 +65,11 @@ const BuyTicketPage: React.FC = () => {
         eventId={eventId}
         seatingType={event.seatingType}
         onNext={(chosenSeats) => {
-          setSeat(chosenSeats);
+          setFormData(prev => ({ ...prev, seat: chosenSeats }));
           nextStep();
         }}
+        onBack={step > 0 ? prevStep : undefined}
+        initialSeats={formData.seat as string[] | null}
       />
     );
   } else if (event.seatingType === 'none') {
@@ -62,10 +77,11 @@ const BuyTicketPage: React.FC = () => {
       <StepChooseCount
         key="choose-count"
         onNext={(selectedCount) => {
-          setCount(selectedCount);
-          setSeat(null);
+          setFormData(prev => ({ ...prev, count: selectedCount, seat: null }));
           nextStep();
         }}
+        onBack={step > 0 ? prevStep : undefined}
+        initialCount={formData.count}
       />
     );
   }
@@ -74,32 +90,34 @@ const BuyTicketPage: React.FC = () => {
     <StepUserData
       key="user-data"
       initialEmail={userEmail}
+      initialData={formData.userData}
       onNext={(data) => {
-        setUserData(data);
+        setFormData(prev => ({ ...prev, userData: data }));
         nextStep();
       }}
-      onBack={() => setStep(step - 1)}
+      onBack={prevStep}
     />
   );
+
   steps.push(
     <StepPayment
       key="payment"
       eventTitle={event.title}
-      amount={event.price * (event.seatingType === 'none' ? count : (Array.isArray(seat) ? seat.length : 1))}
+      amount={event.price * (event.seatingType === 'none' ? formData.count : (Array.isArray(formData.seat) ? formData.seat.length : 1))}
       onPay={async () => {
-        if (!userData) return;
+        if (!formData.userData) return;
         setLoading(true);
         setError(null);
         setToast(null);
         try {
-          let seatToSend = seat;
+          let seatToSend = formData.seat;
           if (event.seatingType === 'none') {
-            seatToSend = Array(count).fill(null); // массив из count билетов без мест
+            seatToSend = Array(formData.count).fill(null); // массив из count билетов без мест
           }
           await dispatch(buyTicket({
             eventId: Number(eventId),
             seat: Array.isArray(seatToSend) && seatToSend.length === 1 ? seatToSend[0] : seatToSend,
-            ...userData,
+            ...formData.userData,
           }) as any);
           await dispatch(fetchUserTickets() as any);
           setToast({ message: 'Билеты успешно куплены!', type: 'success' });
@@ -112,15 +130,16 @@ const BuyTicketPage: React.FC = () => {
         }
       }}
       loading={loading}
-      onBack={() => setStep(step - 1)}
+      onBack={prevStep}
     />
   );
+
   steps.push(
     <StepSuccess
       key="success"
       eventTitle={event.title}
-      places={Array.isArray(seat) ? seat : undefined}
-      count={event.seatingType === 'none' ? count : (Array.isArray(seat) ? seat.length : 1)}
+      places={Array.isArray(formData.seat) ? formData.seat : undefined}
+      count={event.seatingType === 'none' ? formData.count : (Array.isArray(formData.seat) ? formData.seat.length : 1)}
       onGoToTickets={() => navigate('/my-tickets')}
       onGoHome={() => navigate('/')}
     />

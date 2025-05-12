@@ -7,6 +7,7 @@ interface StepChooseSeatProps {
   onNext: (seat: string[] | null) => void;
   onBack?: () => void;
   seatingType?: 'grid' | 'circle';
+  initialSeats?: string[] | null;
 }
 
 const SECTOR_GAP = 6; // зазор между секторами в градусах
@@ -21,8 +22,15 @@ const SEATS_PER_ROW = 7;
 const SEAT_SIZE = 18;
 const RADIUS_STEP = 32;
 
-const StepChooseSeat: React.FC<StepChooseSeatProps> = ({ eventId, onNext, onBack, seatingType = 'grid' }) => {
-  const { bookedSeats, selectedSeats, loading, error, handleSelect } = useChooseSeat(eventId);
+const StepChooseSeat: React.FC<StepChooseSeatProps> = ({ eventId, onNext, onBack, seatingType = 'grid', initialSeats = null }) => {
+  const { bookedSeats, selectedSeats, setSelectedSeats, loading, error, handleSelect } = useChooseSeat(eventId);
+
+  // Устанавливаем начальные значения при монтировании
+  React.useEffect(() => {
+    if (initialSeats) {
+      setSelectedSeats(initialSeats);
+    }
+  }, []);
 
   const handleNext = () => {
     if (selectedSeats.length > 0) onNext(selectedSeats);

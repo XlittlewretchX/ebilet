@@ -4,12 +4,28 @@ import { useUserData, validateEmail, validatePhone } from '../model/useUserData'
 
 interface StepUserDataProps {
   initialEmail: string;
+  initialData?: { name: string; phone: string; email: string } | null;
   onNext: (data: { name: string; phone: string; email: string }) => void;
   onBack?: () => void;
 }
 
-const StepUserData: React.FC<StepUserDataProps> = ({ initialEmail, onNext, onBack }) => {
-  const { name, setName, phone, setPhone, email, setEmail, touched, setTouched, isValid } = useUserData(initialEmail);
+const StepUserData: React.FC<StepUserDataProps> = ({ initialEmail, initialData, onNext, onBack }) => {
+  const { 
+    name, setName, 
+    phone, setPhone, 
+    email, setEmail, 
+    touched, setTouched, 
+    isValid 
+  } = useUserData(initialData?.email || initialEmail);
+
+  // Устанавливаем начальные значения при монтировании
+  React.useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setPhone(initialData.phone);
+      setEmail(initialData.email);
+    }
+  }, []);
 
   return (
     <form

@@ -5,10 +5,11 @@ import { useChooseCount, MAX_COUNT } from '../model/useChooseCount';
 interface StepChooseCountProps {
   onNext: (count: number) => void;
   onBack?: () => void;
+  initialCount?: number;
 }
 
-const StepChooseCount: React.FC<StepChooseCountProps> = ({ onNext, onBack }) => {
-  const { count, decrement, increment, setCount } = useChooseCount(1);
+const StepChooseCount: React.FC<StepChooseCountProps> = ({ onNext, onBack, initialCount = 1 }) => {
+  const { count, decrement, increment, setCount } = useChooseCount(initialCount);
 
   return (
     <div className={styles.container}>
