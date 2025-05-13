@@ -2,9 +2,16 @@
   min-height: 100vh;
   background-color: #f8f9fa;
   padding: 2rem 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 
   @media (max-width: 768px) {
-    padding: 1rem 0;
+    padding: 0.75rem 0;
+  }
+
+  @media (max-width: 340px) {
+    padding: 0.5rem 0;
   }
 }
 
@@ -15,10 +22,18 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 2rem;
+  width: 100%;
+  max-width: 100%;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0 0.75rem;
+  }
+
+  @media (max-width: 340px) {
+    padding: 0 0.5rem;
+    gap: 0.75rem;
   }
 }
 
@@ -28,26 +43,58 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
+  position: sticky;
+  top: 1rem;
+  width: 100%;
+  max-width: 100%;
 
   @media (max-width: 768px) {
-    padding: 0;
-    background: none;
-    box-shadow: none;
-    width: 100%;
+    position: relative;
+    top: 0;
+    padding: 1rem;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 340px) {
+    padding: 0.75rem;
   }
 }
 
 .main {
   min-height: 500px;
+  width: 100%;
+  max-width: 100%;
+
+  @media (max-width: 768px) {
+    min-height: 300px;
+  }
+
+  @media (max-width: 340px) {
+    min-height: 250px;
+  }
 }
 
 .eventsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 
   @media (max-width: 768px) {
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 340px) {
+    gap: 0.5rem;
   }
 }
 
@@ -59,9 +106,21 @@
   min-height: 200px;
   font-size: 1.125rem;
   color: #666;
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+  max-width: 100%;
 
   @media (max-width: 768px) {
     font-size: 1rem;
+    min-height: 150px;
+    padding: 0.75rem;
+  }
+
+  @media (max-width: 340px) {
+    font-size: 0.9rem;
+    min-height: 120px;
+    padding: 0.5rem;
   }
 }
 
