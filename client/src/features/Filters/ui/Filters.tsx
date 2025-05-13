@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './Filters.module.scss';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { setFilters, resetFilters } from '@/features/Filters/filterSlice';
@@ -13,10 +13,22 @@ const subcategoriesMap: Record<string, string[]> = {
 const Filters: React.FC = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector((state) => state.filter);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Блокируем скролл при открытом фильтре на мобильных
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleChange = (field: keyof typeof filters, value: any) => {
     let newFilters = { ...filters, [field]: value };
-    // Если меняется категория, сбрасываем подкатегорию
     if (field === 'category') {
       newFilters = { ...newFilters, subcategory: '' };
     }
@@ -25,12 +37,26 @@ const Filters: React.FC = () => {
 
   const handleReset = () => {
     dispatch(resetFilters());
-    //window.dispatchEvent(new Event('reset-date-strip'));
   };
 
-  return (
-    <div className={styles.filters}>
-      <h3 className={styles.title}>Фильтры</h3>
+  const toggleFilters = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeFilters = () => {
+    setIsOpen(false);
+  };
+
+  const FilterContent = () => (
+    <>
+      <div className={styles.mobileHeader}>
+        <h3 className={styles.title}>Фильтры</h3>
+        <button className={styles.closeButton} onClick={closeFilters} aria-label="Закрыть фильтры">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
 
       <div className={styles.section}>
         <label className={styles.label}>Категория</label>
@@ -96,25 +122,41 @@ const Filters: React.FC = () => {
 
       {/* Чекбокс "Искать в моем городе" */}
       <div className={styles.section}>
-        <label className={styles.label} style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
+        <div className={styles.checkboxWrapper}>
           <input
             type="checkbox"
+            id="onlyMyCity"
             checked={filters.onlyMyCity}
             onChange={e => handleChange('onlyMyCity', e.target.checked)}
-            style={{marginRight:'0.5rem'}}
           />
-          Искать в моем городе
-        </label>
+          <label htmlFor="onlyMyCity" className={styles.label} style={{ margin: 0 }}>
+            Искать в моем городе
+          </label>
+        </div>
       </div>
 
       <button
         className={styles.resetBtn}
         onClick={handleReset}
-        style={{marginTop: '1.5rem', width: '100%', background:'#e3eaff', color:'#2563eb', border:'none', borderRadius:'6px', padding:'0.6rem 0', fontWeight:600, cursor:'pointer'}}
       >
         Сбросить фильтры
       </button>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      <button className={styles.filterToggle} onClick={toggleFilters}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.33333 15H11.6667V13.3333H8.33333V15ZM2.5 5V6.66667H17.5V5H2.5ZM5 10.8333H15V9.16667H5V10.8333Z" fill="currentColor"/>
+        </svg>
+        Фильтры
+      </button>
+
+      <div className={`${styles.filters} ${isOpen ? styles.open : ''}`}>
+        <FilterContent />
+      </div>
+    </>
   );
 };
 
