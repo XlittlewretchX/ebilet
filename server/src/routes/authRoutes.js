@@ -19,6 +19,7 @@ const upload = multer({ storage });
 
 router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
+router.get('/check', auth, AuthController.checkAuth);
 router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
   try {
     const avatarUrl = `/uploads/${req.file.filename}`;

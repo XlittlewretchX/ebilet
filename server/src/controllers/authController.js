@@ -150,6 +150,31 @@ class AuthController {
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }
+
+  static async checkAuth(req, res) {
+    try {
+      const userId = req.user.id;
+      const user = await User.findById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'Пользователь не найден' });
+      }
+
+      res.json({
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          city: user.city,
+          avatarUrl: user.avatarUrl
+        },
+        token: req.headers.authorization.split(' ')[1]
+      });
+    } catch (error) {
+      console.error('Ошибка при проверке аутентификации:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
 }
 
 module.exports = AuthController; 

@@ -75,6 +75,11 @@ export const authAPI = {
     const response = await api.get('/auth/my-tickets');
     return response.data;
   },
+
+  checkAuth: async () => {
+    const response = await api.get('/auth/check');
+    return response.data;
+  },
 };
 
 export const eventAPI = {

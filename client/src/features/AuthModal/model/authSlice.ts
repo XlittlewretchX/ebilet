@@ -147,6 +147,27 @@ export const fetchUserTickets = createAsyncThunk(
   }
 );
 
+export const checkAuth = createAsyncThunk(
+  'auth/checkAuth',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return rejectWithValue(null);
+      }
+      const response = await authAPI.checkAuth();
+      return response;
+    } catch (err) {
+      const error = err as any;
+      localStorage.removeItem('token');
+      if (error.response?.data?.message) {
+        return rejectWithValue(error.response.data.message);
+      }
+      return rejectWithValue('Ошибка аутентификации');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -248,6 +269,25 @@ const authSlice = createSlice({
       .addCase(fetchUserTickets.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string || 'Ошибка при получении билетов';
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(checkAuth.rejected, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        if (action.payload !== null) {
+          state.error = action.payload as string || 'Ошибка аутентификации';
+        }
       });
   },
 });
