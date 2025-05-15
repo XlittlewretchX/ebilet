@@ -7,6 +7,7 @@ import HomePage from '@/pages/HomePage/ui/HomePage';
 import ProfilePage from '@/pages/ProfilePage/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage';
 import BuyTicketPage from '@/pages/BuyTicketPage';
+import ProtectedRoute from '@/shared/ui/ProtectedRoute';
 import styles from './app/styles/App.module.scss';
 
 const basename = process.env.NODE_ENV === 'production' ? '/ebilet' : '';
@@ -20,8 +21,22 @@ const App: React.FC = () => {
           <main className={styles.main}>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/my-tickets" element={<MyTicketsPage />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-tickets"
+                element={
+                  <ProtectedRoute>
+                    <MyTicketsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/buy/:eventId" element={<BuyTicketPage />} />
             </Routes>
           </main>
