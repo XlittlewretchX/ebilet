@@ -68,7 +68,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   style={{ color: '#2563eb', fontWeight: 700 }}
                   onClick={() => onRemoveFromFavorites && onRemoveFromFavorites(event.id)}
                 >
-                  В избранном
+                  Из избранного
                 </button>
               ) : (
                 <button

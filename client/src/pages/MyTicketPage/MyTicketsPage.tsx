@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './MyTicketPage.module.scss';
 import { useAppSelector, useAppDispatch } from '@/shared/lib/hooks';
 import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
-import { fetchFavorites, fetchUserTickets } from '@/features/AuthModal/model/authSlice';
+import { fetchFavorites, fetchUserTickets, removeFavorite } from '@/features/AuthModal/model/authSlice';
 import { fetchEvents } from '@/entities/Event/model/eventSlice';
 
 const TABS = [
@@ -35,6 +35,12 @@ const MyTicketsPage: React.FC = () => {
     return acc;
   }, {} as Record<number, any>);
   const ticketsForWidget = Object.values(groupedTickets);
+
+  const handleRemoveFromFavorites = async (eventId: number) => {
+    await dispatch(removeFavorite(eventId));
+    dispatch(fetchFavorites());
+    dispatch(fetchEvents({}));
+  };
 
   useEffect(() => {
     if (activeTab === 'tickets') {
@@ -86,7 +92,7 @@ const MyTicketsPage: React.FC = () => {
             <EventListWidget
               events={favoriteEvents}
               onAddToFavorites={() => {}}
-              onRemoveFromFavorites={() => {}}
+              onRemoveFromFavorites={handleRemoveFromFavorites}
               onBuyTicket={() => {}}
               loading={loading}
               error={error}
