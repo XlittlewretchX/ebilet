@@ -96,7 +96,7 @@ const AuthAlertModal: React.FC<AuthAlertModalProps> = ({ isOpen, onClose, onAuth
       <div style={boxStyle} onClick={e => e.stopPropagation()}>
         <button style={closeStyle} onClick={onClose} aria-label="Закрыть">×</button>
         <div style={{ fontSize: '1.15rem', color: '#222', marginBottom: 16 }}>
-          Чтобы добавить событие в избранное, необходимо войти в аккаунт
+          Для продолжения необходимо войти в аккаунт
         </div>
         <button style={buttonStyle} onClick={onAuthClick}>
           Войти или зарегистрироваться

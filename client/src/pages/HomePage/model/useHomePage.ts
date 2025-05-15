@@ -58,6 +58,10 @@ export const useHomePage = () => {
   const navigate = useNavigate();
 
   const handleBuyTicket = (id: number) => {
+    if (!isAuthenticated) {
+      setShowAuthAlert(true);
+      return;
+    }
     navigate(`/buy/${id}`);
   };
 
