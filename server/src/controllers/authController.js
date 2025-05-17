@@ -9,26 +9,33 @@ class AuthController {
   static async register(req, res) {
     try {
       const { username, email, password, city } = req.body;
+      console.log(`\n[${new Date().toISOString()}] Попытка регистрации нового пользователя:`);
+      console.log(`Username: ${username}`);
+      console.log(`Email: ${email}`);
+      console.log(`Город: ${city}`);
 
       const existingUser = await User.findByUsername(username);
       if (existingUser) {
+        console.log(`❌ Ошибка: Пользователь с именем ${username} уже существует`);
         return res.status(400).json({ message: 'Пользователь с таким именем уже существует' });
       }
 
       const existingEmail = await User.findByEmail(email);
       if (existingEmail) {
+        console.log(`❌ Ошибка: Email ${email} уже зарегистрирован`);
         return res.status(400).json({ message: 'Пользователь с таким email уже существует' });
       }
 
       const user = await User.create({ username, email, password, city });
       const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
 
-      // Логирование для Render
-      console.log(`Новый пользователь зарегистрирован: ${username} (${email}), город: ${city}`);
+      console.log(`✅ Успешная регистрация пользователя ${username}`);
+      console.log(`ID пользователя: ${user.id}`);
+      console.log('----------------------------------------');
 
       res.status(201).json({ token, user: { id: user.id, username: user.username, email: user.email, city: user.city } });
     } catch (error) {
-      console.error('Ошибка при регистрации:', error);
+      console.error('❌ Ошибка при регистрации:', error);
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }
@@ -36,19 +43,28 @@ class AuthController {
   static async login(req, res) {
     try {
       const { username, password } = req.body;
+      console.log(`\n[${new Date().toISOString()}] Попытка входа пользователя:`);
+      console.log(`Username: ${username}`);
 
       const user = await User.findByUsername(username);
       if (!user) {
+        console.log(`❌ Ошибка: Пользователь ${username} не найден`);
         return res.status(400).json({ message: 'Пользователь не найден' });
       }
 
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
+        console.log(`❌ Ошибка: Неверный пароль для пользователя ${username}`);
         return res.status(400).json({ message: 'Неверный пароль' });
       }
-      console.log(`Пользователь вошел в систему: ${username}`);
 
       const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '24h' });
+
+      console.log(`✅ Успешный вход пользователя ${username}`);
+      console.log(`ID пользователя: ${user.id}`);
+      console.log(`Email: ${user.email}`);
+      console.log(`Город: ${user.city}`);
+      console.log('----------------------------------------');
 
       res.json({
         token,
@@ -61,7 +77,7 @@ class AuthController {
         }
       });
     } catch (error) {
-      console.error('Ошибка при входе:', error);
+      console.error('❌ Ошибка при входе:', error);
       res.status(500).json({ message: 'Ошибка сервера' });
     }
   }
