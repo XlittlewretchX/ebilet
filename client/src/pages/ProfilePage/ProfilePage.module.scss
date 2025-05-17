@@ -294,11 +294,29 @@
   }
 }
 
-.avatarUpload {
+.avatarActions {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 2;
+
+  @media (max-width: 480px) {
+    gap: 0.35rem;
+  }
+}
+
+.avatarWrapper:hover .avatarActions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.avatarUpload {
   background: rgba(227, 234, 255, 0.92);
   color: #2563eb;
   border-radius: 50px;
@@ -308,13 +326,15 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   border: none;
   cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #2563eb;
+    color: white;
+  }
 
   @media (max-width: 480px) {
     padding: 0.4rem 1rem;
@@ -322,14 +342,128 @@
   }
 }
 
-.avatarWrapper:hover .avatarUpload,
-.avatarWrapper:focus-within .avatarUpload {
-  opacity: 1;
-  pointer-events: auto;
+.avatarReset {
+  background: rgba(255, 255, 255, 0.92);
+  color: #dc3545;
+  border-radius: 50px;
+  padding: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #dc3545;
+    color: white;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+  }
 }
 
 .avatarUpload svg {
   margin-right: 0.3rem;
+}
+
+.usernameEdit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8faff;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid #e3eaff;
+  transition: border-color 0.2s;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+
+  @media (max-width: 480px) {
+    padding: 0.4rem 0.75rem;
+    gap: 0.35rem;
+  }
+
+  &:focus-within {
+    border-color: #2563eb;
+  }
+}
+
+.usernameInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  color: #2563eb;
+  font-weight: 600;
+  padding: 0.25rem 0;
+  min-width: 0;
+  width: 100%;
+
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+}
+
+.usernameActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+
+  @media (max-width: 480px) {
+    gap: 0.35rem;
+  }
+}
+
+.usernameActions button {
+  padding: 0.4rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  @media (max-width: 480px) {
+    padding: 0.35rem;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.usernameActions .saveButton {
+  background: #2563eb;
+  color: white;
+
+  &:hover {
+    background: #1d4ed8;
+  }
+}
+
+.usernameActions .cancelButton {
+  background: #e3eaff;
+  color: #2563eb;
+
+  &:hover {
+    background: #dbeafe;
+  }
 }
 
 .info {
@@ -534,7 +668,7 @@
   }
   .greeting {
     font-size: 1.2rem;
-    max-width: 120px;
+    max-width: 200px;
   }
   .statItem {
     padding: 0.7rem 0.5rem;
@@ -656,4 +790,20 @@
 .logoutWrapper {
   position: relative;
   display: inline-block;
+}
+
+.updateError {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 0;
+  right: 0;
+  color: #dc3545;
+  font-size: 0.85rem;
+  text-align: center;
+  animation: fadeIn 0.2s;
+
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    bottom: -1.25rem;
+  }
 }

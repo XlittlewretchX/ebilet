@@ -43,7 +43,7 @@ const Header: React.FC = () => {
     ? (user.avatarUrl.startsWith('/uploads')
         ? `${process.env.REACT_APP_API_URL?.replace('/api', '')}${user.avatarUrl}`
         : user.avatarUrl)
-    : '/img/default-avatar.svg';
+    : process.env.REACT_APP_DEFAULT_AVATAR_URL || '/img/default-avatar.svg';
 
   return (
     <header className={styles.header}>

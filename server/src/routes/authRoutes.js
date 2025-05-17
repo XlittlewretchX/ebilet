@@ -31,7 +31,11 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
   }
 });
 
+router.delete('/avatar', auth, AuthController.resetAvatar);
+
 router.patch('/city', auth, AuthController.updateCity);
+
+router.patch('/username', auth, AuthController.updateUsername);
 
 router.post('/favorite', auth, AuthController.addFavorite);
 router.delete('/favorite', auth, AuthController.removeFavorite);

@@ -66,10 +66,26 @@ export const login = createAsyncThunk(
 
 export const uploadAvatar = createAsyncThunk(
   'auth/uploadAvatar',
-  async (file: File) => {
-    const response = await authAPI.uploadAvatar(file);
-    return response;
-  },
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.uploadAvatar(file);
+      return response.avatarUrl;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка при загрузке аватара');
+    }
+  }
+);
+
+export const resetAvatar = createAsyncThunk(
+  'auth/resetAvatar',
+  async (_, { rejectWithValue }) => {
+    try {
+      await authAPI.resetAvatar();
+      return undefined;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка при сбросе аватара');
+    }
+  }
 );
 
 export const updateCity = createAsyncThunk(
@@ -80,6 +96,18 @@ export const updateCity = createAsyncThunk(
       return response.city;
     } catch (err) {
       return rejectWithValue('Ошибка при обновлении города');
+    }
+  }
+);
+
+export const updateUsername = createAsyncThunk(
+  'auth/updateUsername',
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.updateUsername(username);
+      return response.username;
+    } catch (err) {
+      return rejectWithValue('Ошибка при обновлении имени пользователя');
     }
   }
 );
@@ -220,12 +248,22 @@ const authSlice = createSlice({
       })
       .addCase(uploadAvatar.fulfilled, (state, action) => {
         if (state.user) {
-          state.user.avatarUrl = action.payload.avatarUrl;
+          state.user.avatarUrl = action.payload;
+        }
+      })
+      .addCase(resetAvatar.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.avatarUrl = undefined;
         }
       })
       .addCase(updateCity.fulfilled, (state, action) => {
         if (state.user) {
           state.user.city = action.payload;
+        }
+      })
+      .addCase(updateUsername.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.username = action.payload;
         }
       })
       .addCase(addFavorite.fulfilled, (state, action) => {

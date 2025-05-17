@@ -81,6 +81,39 @@ class AuthController {
     }
   }
 
+  static async resetAvatar(req, res) {
+    try {
+      const userId = req.user.id;
+      await User.resetAvatar(userId);
+      res.json({ avatarUrl: null });
+    } catch (error) {
+      console.error('Ошибка при сбросе аватара:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
+  static async updateUsername(req, res) {
+    try {
+      const userId = req.user.id;
+      const { username } = req.body;
+      
+      if (!username) {
+        return res.status(400).json({ message: 'Имя пользователя обязательно' });
+      }
+
+      const existingUser = await User.findByUsername(username);
+      if (existingUser && existingUser.id !== userId) {
+        return res.status(400).json({ message: 'Пользователь с таким именем уже существует' });
+      }
+
+      await User.updateUsername(userId, username);
+      res.json({ username });
+    } catch (error) {
+      console.error('Ошибка при обновлении имени пользователя:', error);
+      res.status(500).json({ message: 'Ошибка сервера' });
+    }
+  }
+
   static async addFavorite(req, res) {
     try {
       const userId = req.user.id;

@@ -47,11 +47,37 @@ class User {
     });
   }
 
+  static async resetAvatar(userId) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE users SET avatarUrl = NULL WHERE id = ?',
+        [userId],
+        (err) => {
+          if (err) reject(err);
+          resolve();
+        }
+      );
+    });
+  }
+
   static async updateCity(userId, city) {
     return new Promise((resolve, reject) => {
       db.run(
         'UPDATE users SET city = ? WHERE id = ?',
         [city, userId],
+        (err) => {
+          if (err) reject(err);
+          resolve();
+        }
+      );
+    });
+  }
+
+  static async updateUsername(userId, username) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE users SET username = ? WHERE id = ?',
+        [username, userId],
         (err) => {
           if (err) reject(err);
           resolve();

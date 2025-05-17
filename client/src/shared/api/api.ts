@@ -46,6 +46,11 @@ export const authAPI = {
     return response.data;
   },
 
+  resetAvatar: async () => {
+    const response = await api.delete('/auth/avatar');
+    return response.data;
+  },
+
   updateCity: async (city: string) => {
     const response = await api.patch('/auth/city', { city });
     return response.data;
@@ -78,6 +83,11 @@ export const authAPI = {
 
   checkAuth: async () => {
     const response = await api.get('/auth/check');
+    return response.data;
+  },
+
+  updateUsername: async (username: string) => {
+    const response = await api.patch('/auth/username', { username });
     return response.data;
   },
 };
