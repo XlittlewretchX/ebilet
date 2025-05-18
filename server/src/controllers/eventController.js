@@ -35,7 +35,7 @@ class EventController {
         subcategory,
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
-        search,
+        search: search ? search.charAt(0).toUpperCase() + search.slice(1).toLowerCase() : undefined,
         city,
       };
       const events = await Event.findAll(filters);
