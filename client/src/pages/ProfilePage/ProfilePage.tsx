@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { fetchUserEvents } from '@/entities/Event/model/eventSlice';
-import { uploadAvatar, logout, updateUsername, resetAvatar } from '@/features/AuthModal/model/authSlice';
+import { uploadAvatar, logout, updateUsername, resetAvatar, fetchUserTickets } from '@/features/AuthModal/model/authSlice';
 import EventCard from '@/entities/Event/ui/EventCard';
 import styles from './ProfilePage.module.scss';
 import type { Event } from '@/shared/types';
@@ -22,6 +22,7 @@ const ProfilePage: React.FC = () => {
   useEffect(() => {
     if (user) {
       dispatch(fetchUserEvents());
+      dispatch(fetchUserTickets());
     }
   }, [dispatch, user]);
 
