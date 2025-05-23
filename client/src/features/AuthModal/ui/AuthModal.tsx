@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { login, register } from '@/features/AuthModal/model/authSlice';
+import { login, register, clearError } from '@/features/AuthModal/model/authSlice';
 import styles from '@/features/AuthModal/ui/AuthModal.module.scss';
 import type { RootState } from '@/app/store';
 
@@ -29,7 +29,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      alert('Пароли не совпадают');
+      dispatch(clearError());
+      dispatch({ type: 'auth/register/rejected', payload: 'Пароли не совпадают' });
       return;
     }
 
@@ -64,8 +65,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         confirmPassword: '',
       });
       setSuccessMessage('');
+      dispatch(clearError());
     }
-  }, [isOpen, isLogin]);
+  }, [isOpen, isLogin, dispatch]);
+
+  const handleModeSwitch = () => {
+    setIsLogin(!isLogin);
+    dispatch(clearError());
+  };
 
   function getScrollbarWidth() {
     if (typeof window === 'undefined') return 0;
@@ -165,7 +172,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </form>
         <p className={styles.switch}>
           {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}{' '}
-          <button onClick={() => setIsLogin(!isLogin)}>
+          <button onClick={handleModeSwitch}>
             {isLogin ? 'Зарегистрироваться' : 'Войти'}
           </button>
         </p>
