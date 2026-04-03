@@ -2,18 +2,28 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const CopyPlugin = require('copy-webpack-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/main.ts',
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.vue', '.tsx', '.ts', '.js'],
     alias: { '@': path.resolve(__dirname, 'src') },
   },
   module: {
     rules: [
       {
+        test: /\.vue$/i,
+        loader: 'vue-loader',
+      },
+      {
         test: /\.tsx?$/i,
-        use: 'ts-loader',
+        use: {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          },
+        },
         exclude: /node_modules/,
       },
       {
@@ -23,6 +33,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new VueLoaderPlugin(),
     new HtmlWebpackPlugin({ template: './public/index.html' }),
     new Dotenv({
       path: process.env.NODE_ENV === 'production' ? './.env.production' : './.env',
