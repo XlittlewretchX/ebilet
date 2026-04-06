@@ -14,13 +14,15 @@ export interface FilterState {
   onlyMyCity: boolean;
 }
 
-const initialState: FilterState = {
+const createInitialFilterState = (): FilterState => ({
   category: '',
   subcategory: '',
   dateRange: { start: '', end: '' },
   priceRange: { min: 0, max: 10000 },
   onlyMyCity: false,
-};
+});
+
+const initialState: FilterState = createInitialFilterState();
 
 const filterSlice = createSlice({
   name: 'filter',
@@ -30,10 +32,10 @@ const filterSlice = createSlice({
       return action.payload;
     },
     resetFilters() {
-      return initialState;
+      return createInitialFilterState();
     },
   },
 });
 
 export const { setFilters, resetFilters } = filterSlice.actions;
-export default filterSlice.reducer; 
+export default filterSlice.reducer;
