@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/features/AuthModal/model/authSlice';
 import eventReducer from '@/entities/Event/model/eventSlice';
-import cityReducer from '@/features/ChangeCity/model/citySlice';
+import cityReducer from '@/features/CityPicker/model/citySlice';
 import searchReducer from '@/features/SearchBar/model/searchSlice';
 import filterReducer from '@/features/Filters/filterSlice';
 import mobileMenuReducer from '@/features/MobileMenu/model/mobileMenuSlice';

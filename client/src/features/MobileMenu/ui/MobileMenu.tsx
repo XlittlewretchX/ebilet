@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { logout } from '@/features/AuthModal/model/authSlice';
 import { openMenu, closeMenu, showLogoutConfirm, hideLogoutConfirm } from '../model/mobileMenuSlice';
-import CityPicker from '@/features/ChangeCity/ui/CityPicker';
+import CityPicker from '@/features/CityPicker/ui/CityPicker';
 import styles from './MobileMenu.module.scss';
 import {
   CloseIcon,

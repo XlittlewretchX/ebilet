@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
-import { setCity } from '@/features/ChangeCity/model/citySlice';
+import { setCity } from '@/features/CityPicker/model/citySlice';
 import { updateCity } from '@/features/AuthModal/model/authSlice';
 import type { RootState } from '@/app/store';
 

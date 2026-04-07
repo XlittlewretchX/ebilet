@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from '@/features/ChangeCity/ui/CityPicker.module.scss';
-import { useChangeCity } from '@/features/ChangeCity/model/useChangeCity';
+import { useChangeCity } from '@/features/CityPicker/model/useChangeCity';
 import { CityIcon } from '@/shared/ui/icons';
-import { russianCities } from '@/shared/data/cities';
+import { cities } from '@/features/CityPicker/config/cities';
 import { useAppDispatch } from '@/shared/lib/hooks';
-import { setCity } from '@/features/ChangeCity/model/citySlice';
+import { setCity } from '@/features/CityPicker/model/citySlice';
 import { updateCity } from '@/features/AuthModal/model/authSlice';
 import { useAppSelector } from '@/shared/lib/hooks';
 
@@ -39,7 +39,7 @@ const CityPicker: React.FC = () => {
     setInput(value);
     
     if (value.trim()) {
-      const filteredCities = russianCities.filter(city =>
+      const filteredCities = cities.filter(city =>
         city.toLowerCase().startsWith(value.toLowerCase())
       );
       setSuggestions(filteredCities.slice(0, 5));

@@ -1,4 +1,4 @@
-export const russianCities = [
+export const cities = [
   'Москва',
   'Санкт-Петербург',
   'Новосибирск',
