@@ -157,23 +157,33 @@ const {
   onFiltersChange: (nextFilters) => emit('update:modelValue', nextFilters),
 });
 
+const getSelectTarget = (event: Event): HTMLSelectElement | null =>
+  event.target instanceof HTMLSelectElement ? event.target : null;
+
+const getInputTarget = (event: Event): HTMLInputElement | null =>
+  event.target instanceof HTMLInputElement ? event.target : null;
+
 const onCategorySelect = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
+  const target = getSelectTarget(event);
+  if (!target) return;
   handleCategoryChange(target.value);
 };
 
 const onSubcategorySelect = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
+  const target = getSelectTarget(event);
+  if (!target) return;
   handleSubcategoryChange(target.value);
 };
 
 const onPriceInput = (bound: 'min' | 'max', event: Event) => {
-  const target = event.target as HTMLInputElement;
+  const target = getInputTarget(event);
+  if (!target) return;
   handlePriceChange(bound, target.value);
 };
 
 const onOnlyCityToggle = (event: Event) => {
-  const target = event.target as HTMLInputElement;
+  const target = getInputTarget(event);
+  if (!target) return;
   handleOnlyMyCityChange(target.checked);
 };
 
