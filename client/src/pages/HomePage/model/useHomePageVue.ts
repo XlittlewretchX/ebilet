@@ -1,10 +1,10 @@
 import { storeToRefs } from 'pinia';
 import type { DateRangeValue } from '@/shared/types/date';
-import { useEventFiltersStore } from '@/entities/EventFilters/model/store';
-import type { FilterState } from '@/entities/EventFilters/model/types';
+import type { FilterState } from '@/features/Filters/model/types';
+import { useHomePageFiltersStore } from './homePageFiltersStore';
 
 export const useHomePageVue = () => {
-  const filtersStore = useEventFiltersStore();
+  const filtersStore = useHomePageFiltersStore();
   const { filters } = storeToRefs(filtersStore);
 
   const handleFiltersChange = (nextFilters: FilterState) => {

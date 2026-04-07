@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import type { DateRangeValue } from '@/shared/types/date';
-import { createInitialFilterState, type FilterState } from './types';
+import { createInitialFilterState, type FilterState } from '@/features/Filters/model/types';
 
-export const useEventFiltersStore = defineStore('eventFilters', {
+export const useHomePageFiltersStore = defineStore('homePageFilters', {
   state: () => ({
     filters: createInitialFilterState() as FilterState,
   }),
