@@ -1,9 +1,10 @@
-import { createInitialDateRange, type DateRangeValue } from '@/shared/types/date';
-
 export interface FilterState {
   category: string;
   subcategory: string;
-  dateRange: DateRangeValue;
+  dateRange: {
+    start: string;
+    end: string;
+  };
   priceRange: {
     min: number;
     max: number;
@@ -12,9 +13,9 @@ export interface FilterState {
 }
 
 export const createInitialFilterState = (): FilterState => ({
-  category: '',
+  category: 'all',
   subcategory: '',
-  dateRange: createInitialDateRange(),
+  dateRange: { start: '', end: '' },
   priceRange: { min: 0, max: 10000 },
   onlyMyCity: false,
 });

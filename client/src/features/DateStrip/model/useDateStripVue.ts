@@ -1,29 +1,11 @@
 import { ref, watch, type Ref } from 'vue';
 import type { DatePickerValue, DateRange, SelectedDateRange } from './types';
-import { formatDate } from '../lib/utils';
-
-type CalendarChangePayload = DatePickerValue;
+import { formatDate, parseDateValue } from '../config/utils';
 
 interface UseDateStripVueParams {
   modelValue: Ref<SelectedDateRange>;
   onDateRangeChange: (value: SelectedDateRange) => void;
 }
-
-const parseDateValue = (value: string): Date | null => {
-  if (!value) {
-    return null;
-  }
-
-  const [year, month, day] = value.split('-').map(Number);
-
-  if (!year || !month || !day) {
-    return null;
-  }
-
-  const parsed = new Date(year, month - 1, day);
-
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
 
 export const useDateStripVue = ({
   modelValue,
@@ -93,7 +75,7 @@ export const useDateStripVue = ({
     });
   };
 
-  const handleCalendarChange = (value: CalendarChangePayload) => {
+  const handleCalendarChange = (value: DatePickerValue) => {
     if (Array.isArray(value)) {
       const [start, end] = value;
 

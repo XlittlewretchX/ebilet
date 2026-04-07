@@ -1,5 +1,5 @@
 export const categoryOptions = [
-  { value: '', label: 'Все категории' },
+  { value: 'all', label: 'Все категории' },
   { value: 'concert', label: 'Концерты' },
   { value: 'theater', label: 'Театр' },
   { value: 'exhibition', label: 'Выставки' },

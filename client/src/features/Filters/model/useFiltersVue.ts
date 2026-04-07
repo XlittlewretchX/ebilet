@@ -1,4 +1,4 @@
-import { computed, onUnmounted, ref, watch, type Ref } from 'vue';
+import { computed, ref, type Ref } from 'vue';
 import { subcategoriesMap } from './constants';
 import { createInitialFilterState, type FilterState } from './types';
 
@@ -10,20 +10,14 @@ interface UseFiltersVueParams {
 export const useFiltersVue = ({ filters, onFiltersChange }: UseFiltersVueParams) => {
   const isOpen = ref(false);
 
-  const availableSubcategories = computed(() => {
-    if (!filters.value.category) {
-      return [];
-    }
-
-    return subcategoriesMap[filters.value.category] ?? [];
-  });
-
-  const applyFilters = (nextFilters: FilterState) => {
-    onFiltersChange(nextFilters);
-  };
+  const availableSubcategories = computed(() =>
+    filters.value.category && filters.value.category !== 'all'
+      ? subcategoriesMap[filters.value.category] ?? []
+      : [],
+  );
 
   const handleCategoryChange = (value: string) => {
-    applyFilters({
+    onFiltersChange({
       ...filters.value,
       category: value,
       subcategory: '',
@@ -31,7 +25,7 @@ export const useFiltersVue = ({ filters, onFiltersChange }: UseFiltersVueParams)
   };
 
   const handleSubcategoryChange = (value: string) => {
-    applyFilters({
+    onFiltersChange({
       ...filters.value,
       subcategory: value.toLowerCase(),
     });
@@ -41,7 +35,7 @@ export const useFiltersVue = ({ filters, onFiltersChange }: UseFiltersVueParams)
     const parsed = Number(value);
     const safeNumber = Number.isFinite(parsed) ? parsed : 0;
 
-    applyFilters({
+    onFiltersChange({
       ...filters.value,
       priceRange: {
         ...filters.value.priceRange,
@@ -51,7 +45,7 @@ export const useFiltersVue = ({ filters, onFiltersChange }: UseFiltersVueParams)
   };
 
   const handleOnlyMyCityChange = (value: boolean) => {
-    applyFilters({
+    onFiltersChange({
       ...filters.value,
       onlyMyCity: value,
     });
@@ -66,17 +60,9 @@ export const useFiltersVue = ({ filters, onFiltersChange }: UseFiltersVueParams)
   };
 
   const resetFilters = () => {
-    applyFilters(createInitialFilterState());
+    onFiltersChange(createInitialFilterState());
     closeFilters();
   };
-
-  watch(isOpen, (open) => {
-    document.body.classList.toggle('filters-mobile-locked', open);
-  });
-
-  onUnmounted(() => {
-    document.body.classList.remove('filters-mobile-locked');
-  });
 
   return {
     filters,

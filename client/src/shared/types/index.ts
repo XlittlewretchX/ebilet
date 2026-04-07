@@ -59,6 +59,3 @@ export interface RootState {
   auth: AuthState;
   event: EventState;
 }
-
-export { createInitialDateRange } from './date';
-export type { DateRangeValue } from './date';
