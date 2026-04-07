@@ -1,19 +1,9 @@
-export interface DateStripProps {
-  onDateSelect: (date: string) => void;
-  onRangeSelect: (start: string, end: string) => void;
+export interface SelectedDateRange {
+  start: string;
+  end: string;
 }
 
-export interface DateStripState {
-  calendarOpen: boolean;
-  selectedDate: Date | null;
-  selectedRange: [Date | null, Date | null];
-  month: number;
-  year: number;
-}
+export type DateRange = [Date | null, Date | null]; 
+export type DatePickerValue = Date | [Date, Date] | [Date, null];
 
-export const weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
 
-export const months = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
-]; 

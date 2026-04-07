@@ -5,8 +5,6 @@ import { setFilters, resetFilters } from '@/features/Filters/filterSlice';
 import { useEffect } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
 import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
-import Filters from '@/features/Filters/ui/Filters';
-import DateStrip from '@/features/DateStrip/ui/DateStrip';
 import styles from '@/pages/HomePage/HomePage.module.scss';
 import { useHomePage } from '../model/useHomePage';
 import AuthModal from '@/features/AuthModal/ui/AuthModal';
@@ -42,13 +40,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className={styles.homePage}>
-      <div style={{display:'flex', alignItems:'center', gap:'1.5rem', marginBottom:'-1.5rem'}}>
-        <DateStrip onDateSelect={handleDateSelect} onRangeSelect={handleRangeSelect} />
-      </div>
       <div className={styles.content}>
-        <aside className={styles.sidebar}>
-          <Filters />
-        </aside>
         <main className={styles.main}>
           <EventListWidget
             events={filteredEvents}

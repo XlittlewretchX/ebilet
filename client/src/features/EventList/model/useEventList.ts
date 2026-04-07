@@ -18,6 +18,7 @@ export const useEventList = () => {
     // Категория
     const matchesCategory =
       !filters.category ||
+      filters.category === 'all' ||
       (event.category && event.category.trim().toLowerCase() === filters.category.trim().toLowerCase());
     // Дата
     let matchesDate = true;
