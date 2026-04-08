@@ -41,7 +41,7 @@
           <h2 id="city-picker-title" class="city-picker__title">Выбор города</h2>
         </header>
 
-        <form class="city-picker__form" @submit.prevent="handleSave">
+        <form class="city-picker__form" @submit.prevent="saveCurrentCity()">
           <label class="city-picker__label city-picker__label--hidden" for="city-picker-input">
             Введите город
           </label>
@@ -89,7 +89,7 @@
                         index === activeSuggestionIndex,
                     },
                   ]"
-                  @click="handleSuggestionClick(city)"
+                  @click="saveCurrentCity(city)"
                 >
                   {{ city }}
                 </button>
@@ -157,9 +157,7 @@ const saveCity = (rawValue: string): string | null => {
   return nextCity;
 };
 
-const getSuggestionId = (city: string) => (
-  `city-picker-suggestion-${city.toLowerCase().replace(/\s+/g, '-')}`
-);
+const getSuggestionId = (city: string) => city.toLowerCase().replace(/\s+/g, '-');
 
 const clearSuggestions = () => {
   suggestions.value = [];
@@ -194,10 +192,6 @@ const saveCurrentCity = (rawValue = cityQuery.value) => {
   return true;
 };
 
-const selectSuggestion = (city: string) => {
-  saveCurrentCity(city);
-};
-
 const selectNextSuggestion = () => {
   if (!hasSuggestions.value) {
     return;
@@ -222,8 +216,7 @@ const selectActiveSuggestion = () => {
     return false;
   }
 
-  selectSuggestion(activeCity);
-  return true;
+  return saveCurrentCity(activeCity);
 };
 
 const activeSuggestionId = computed(() => {
@@ -259,14 +252,6 @@ const handleInput = (event: Event) => {
   }
 
   updateQuery(event.target.value);
-};
-
-const handleSuggestionClick = (city: string) => {
-  selectSuggestion(city);
-};
-
-const handleSave = () => {
-  saveCurrentCity();
 };
 
 const handleKeydown = (event: KeyboardEvent) => {
