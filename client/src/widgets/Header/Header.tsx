@@ -9,7 +9,6 @@ import UserMenu from '@/features/UserMenu/ui/UserMenu';
 import { MobileMenu } from '@/features/MobileMenu/ui/MobileMenu';
 import { openMenu } from '@/features/MobileMenu/model/mobileMenuSlice';
 import styles from '@/widgets/Header/Header.module.scss';
-import SearchBar from '@/features/SearchBar/ui/SearchBar';
 import { MobileMenuIcon } from '@/shared/ui/icons';
 import type { RootState } from '@/app/store';
 
@@ -51,7 +50,6 @@ const Header: React.FC = () => {
         <Link to="/" className={styles.logo}>
           eBilet
         </Link>
-        <SearchBar />
         <nav className={styles.nav}>
           <CityPicker />
           {isAuthenticated ? (

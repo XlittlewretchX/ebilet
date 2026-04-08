@@ -12,9 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { CityPicker } from '@/features/CityPicker';
-import { UserMenu } from '@/features/UserMenu';
-import SearchBar from '@/features/SearchBar/ui/SearchBar.vue';
 import DateStrip from '@/features/DateStrip/ui/DateStrip.vue';
 import Filters from '@/features/Filters/ui/Filters.vue';
 import { useHomePageVue } from '../model/useHomePageVue';

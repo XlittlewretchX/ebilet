@@ -12,24 +12,13 @@ export const useHomePage = () => {
   const { loading, error } = useAppSelector((state) => state.event);
   const filters = useAppSelector((state) => state.filter);
   const debouncedFilters = useDebounce(filters, 300);
-  const { filteredEvents } = useEventList();
   const [showLoader, setShowLoader] = useState(false);
-  const search = useAppSelector((state) => state.search.value);
   const city = useAppSelector((state) => state.city.name);
   const favorites = useAppSelector((state) => state.auth.user?.favorites || []);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const [showAuthAlert, setShowAuthAlert] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  useEffect(() => {
-    const filtersToSend: any = { ...debouncedFilters, search };
-    if (debouncedFilters.onlyMyCity && city && city !== 'Город') {
-      filtersToSend.city = city;
-    } else {
-      delete filtersToSend.city;
-    }
-    dispatch(fetchEvents(filtersToSend));
-  }, [dispatch, debouncedFilters, search, city]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;
@@ -83,16 +72,10 @@ export const useHomePage = () => {
     );
   };
 
-  // Обогащаем события флагом избранного
-  const eventsWithFavorite = filteredEvents.map(event => ({
-    ...event,
-    isFavorite: favorites.includes(event.id),
-  }));
 
   return {
     loading: showLoader,
     error,
-    filteredEvents: eventsWithFavorite,
     handleAddToFavorites,
     handleRemoveFromFavorites,
     handleBuyTicket,

@@ -4,7 +4,7 @@
       type="button"
       class="city-picker__trigger"
       aria-haspopup="dialog"
-      :aria-expanded="editing"
+      :aria-expanded="isEditing"
       @click="openPicker"
     >
       <span class="city-picker__icon" aria-hidden="true">
@@ -25,7 +25,7 @@
     </button>
 
     <div
-      v-if="editing"
+      v-if="isEditing"
       class="city-picker__overlay"
       role="presentation"
       @click="closePicker"
@@ -49,7 +49,7 @@
             <input
               id="city-picker-input"
               ref="inputRef"
-              v-model="input"
+              v-model="cityQuery"
               class="city-picker__input"
               type="text"
               name="city"
@@ -57,7 +57,7 @@
               role="combobox"
               aria-autocomplete="list"
               aria-controls="city-picker-suggestions"
-              :aria-expanded="suggestions.length > 0"
+              :aria-expanded="hasSuggestions"
               :aria-activedescendant="activeSuggestionId"
               placeholder="Введите город"
               @input="handleInput"
@@ -65,7 +65,7 @@
             />
 
             <ul
-              v-if="suggestions.length"
+              v-if="hasSuggestions"
               id="city-picker-suggestions"
               ref="suggestionsRef"
               class="city-picker__suggestions"
@@ -74,7 +74,7 @@
             >
               <li
                 v-for="(city, index) in suggestions"
-                :id="`city-picker-suggestion-${index}`"
+                :id="getSuggestionId(city)"
                 :key="city"
                 class="city-picker__suggestion-item"
                 role="option"
@@ -120,21 +120,46 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useCityPicker } from '../model/useCityPicker';
+import { DEFAULT_CITY, useCityStore } from '@/entities/City';
+import { cities } from '../config/cities';
+import { SUGGESTIONS_LIMIT } from '../config/constants';
 
-const {
-  displayCity,
-  getSuggestions,
-  saveCity,
-} = useCityPicker();
+const cityStore = useCityStore();
+const displayCity = computed(() => cityStore.name?.trim() || DEFAULT_CITY);
 
-const editing = ref(false);
-const input = ref(displayCity.value);
+const isEditing = ref(false);
+const cityQuery = ref(displayCity.value);
 const suggestions = ref<string[]>([]);
 const activeSuggestionIndex = ref(-1);
 
 const inputRef = ref<HTMLInputElement | null>(null);
 const suggestionsRef = ref<HTMLUListElement | null>(null);
+const hasSuggestions = computed(() => suggestions.value.length > 0);
+
+const getSuggestions = (value: string): string[] => {
+  const normalizedValue = value.trim().toLowerCase();
+  if (!normalizedValue) {
+    return [];
+  }
+
+  return cities
+    .filter((city) => city.toLowerCase().startsWith(normalizedValue))
+    .slice(0, SUGGESTIONS_LIMIT);
+};
+
+const saveCity = (rawValue: string): string | null => {
+  const nextCity = rawValue.trim();
+  if (!nextCity) {
+    return null;
+  }
+
+  cityStore.setCity(nextCity);
+  return nextCity;
+};
+
+const getSuggestionId = (city: string) => (
+  `city-picker-suggestion-${city.toLowerCase().replace(/\s+/g, '-')}`
+);
 
 const clearSuggestions = () => {
   suggestions.value = [];
@@ -142,24 +167,24 @@ const clearSuggestions = () => {
 };
 
 const closePicker = () => {
-  editing.value = false;
-  input.value = displayCity.value;
+  isEditing.value = false;
+  cityQuery.value = displayCity.value;
   clearSuggestions();
 };
 
 const openPicker = () => {
-  editing.value = true;
-  input.value = displayCity.value;
+  isEditing.value = true;
+  cityQuery.value = displayCity.value;
   clearSuggestions();
 };
 
-const setInputValue = (value: string) => {
-  input.value = value;
+const updateQuery = (value: string) => {
+  cityQuery.value = value;
   suggestions.value = getSuggestions(value);
   activeSuggestionIndex.value = -1;
 };
 
-const saveCurrentCity = (rawValue = input.value) => {
+const saveCurrentCity = (rawValue = cityQuery.value) => {
   const savedCity = saveCity(rawValue);
   if (!savedCity) {
     return false;
@@ -174,23 +199,21 @@ const selectSuggestion = (city: string) => {
 };
 
 const selectNextSuggestion = () => {
-  if (suggestions.value.length === 0) {
+  if (!hasSuggestions.value) {
     return;
   }
 
-  if (activeSuggestionIndex.value < suggestions.value.length - 1) {
-    activeSuggestionIndex.value += 1;
-  }
+  const nextIndex = activeSuggestionIndex.value + 1;
+  activeSuggestionIndex.value = nextIndex >= suggestions.value.length ? 0 : nextIndex;
 };
 
 const selectPreviousSuggestion = () => {
-  if (suggestions.value.length === 0) {
+  if (!hasSuggestions.value) {
     return;
   }
 
-  if (activeSuggestionIndex.value > 0) {
-    activeSuggestionIndex.value -= 1;
-  }
+  const previousIndex = activeSuggestionIndex.value - 1;
+  activeSuggestionIndex.value = previousIndex < 0 ? suggestions.value.length - 1 : previousIndex;
 };
 
 const selectActiveSuggestion = () => {
@@ -204,14 +227,11 @@ const selectActiveSuggestion = () => {
 };
 
 const activeSuggestionId = computed(() => {
-  if (activeSuggestionIndex.value < 0) {
-    return undefined;
-  }
-
-  return `city-picker-suggestion-${activeSuggestionIndex.value}`;
+  const activeCity = suggestions.value[activeSuggestionIndex.value];
+  return activeCity ? getSuggestionId(activeCity) : undefined;
 });
 
-watch(editing, async (isOpen) => {
+watch(isEditing, async (isOpen) => {
   if (!isOpen) {
     return;
   }
@@ -224,11 +244,11 @@ watch(editing, async (isOpen) => {
 watch(
   displayCity,
   (nextCity) => {
-    if (editing.value) {
+    if (isEditing.value) {
       return;
     }
 
-    input.value = nextCity;
+    cityQuery.value = nextCity;
   },
   { immediate: true },
 );
@@ -238,7 +258,7 @@ const handleInput = (event: Event) => {
     return;
   }
 
-  setInputValue(event.target.value);
+  updateQuery(event.target.value);
 };
 
 const handleSuggestionClick = (city: string) => {
@@ -261,14 +281,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       break;
     case 'Enter':
       event.preventDefault();
-      if (activeSuggestionIndex.value >= 0) {
-        selectActiveSuggestion();
-      } else {
+      if (!selectActiveSuggestion()) {
         saveCurrentCity();
       }
       break;
     case 'Escape':
-      if (suggestions.value.length > 0) {
+      if (hasSuggestions.value) {
         clearSuggestions();
       } else {
         closePicker();
@@ -278,7 +296,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 };
 
 const handleDocumentMouseDown = (event: MouseEvent) => {
-  if (!editing.value || suggestions.value.length === 0) {
+  if (!isEditing.value || !hasSuggestions.value) {
     return;
   }
 

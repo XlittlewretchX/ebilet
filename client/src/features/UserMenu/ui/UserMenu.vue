@@ -82,55 +82,71 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { User } from '@/shared/types';
-import { useUserMenuVue } from '../model/useUserMenuVue';
+import { useSessionStore } from '@/entities/Session';
+import { RouteName } from '@/router';
 
-const props = withDefaults(
-  defineProps<{
-    user?: Pick<User, 'username'> | null;
-    avatarUrl?: string;
-  }>(),
-  {
-    user: null,
-    avatarUrl: '',
-  },
-);
-
-const emit = defineEmits<{
-  (event: 'logout'): void;
-  (event: 'profile-click'): void;
-}>();
+const DEFAULT_AVATAR_URL = process.env.REACT_APP_DEFAULT_AVATAR_URL || '/img/default-avatar.svg';
+const apiOrigin = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || '';
 
 const router = useRouter();
-const menuRootRef = ref<HTMLElement | null>(null);
+const sessionStore = useSessionStore();
+const { user } = storeToRefs(sessionStore);
 
-const userName = computed(() => props.user?.username?.trim() || 'Пользователь');
-const resolvedAvatarUrl = computed(
-  () => props.avatarUrl || '',
-);
+const menuRootRef = ref<HTMLElement | null>(null);
+const isMenuOpen = ref(false);
+const isLogoutConfirmOpen = ref(false);
+
+const userName = computed(() => user.value?.username?.trim() || 'Пользователь');
+const resolvedAvatarUrl = computed(() => {
+  const source = user.value?.avatarUrl?.trim();
+
+  if (!source) {
+    return DEFAULT_AVATAR_URL;
+  }
+
+  if (source.startsWith('/uploads')) {
+    return apiOrigin ? `${apiOrigin}${source}` : source;
+  }
+
+  return source;
+});
+
+const closeMenu = () => {
+  isMenuOpen.value = false;
+  isLogoutConfirmOpen.value = false;
+};
+
+const toggleMenu = () => {
+  if (isMenuOpen.value) {
+    closeMenu();
+    return;
+  }
+
+  isMenuOpen.value = true;
+  isLogoutConfirmOpen.value = false;
+};
+
+const requestLogoutConfirmation = () => {
+  isLogoutConfirmOpen.value = true;
+};
+
+const cancelLogout = () => {
+  isLogoutConfirmOpen.value = false;
+};
 
 const handleProfileAction = async () => {
   closeMenu();
-  emit('profile-click');
-  await router.push('/profile');
+  await router.push({ name: RouteName.Profile });
 };
 
 const handleConfirmLogout = () => {
-  emit('logout');
-  confirmLogout();
+  sessionStore.logout();
+  closeMenu();
+  void router.push({ name: RouteName.Home });
 };
-
-const {
-  isMenuOpen,
-  isLogoutConfirmOpen,
-  closeMenu,
-  toggleMenu,
-  requestLogoutConfirmation,
-  cancelLogout,
-  confirmLogout,
-} = useUserMenuVue();
 
 const handleDocumentMouseDown = (event: MouseEvent) => {
   if (!isMenuOpen.value) {

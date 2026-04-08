@@ -1,30 +1,30 @@
 <template>
   <header class="header-widget">
     <div class="header-widget__container">
-      <RouterLink to="/" class="header-widget__logo" aria-label="Перейти на главную">
+      <router-link
+        :to="{ name: RouteName.Home }"
+        class="header-widget__logo"
+        aria-label="Перейти на главную"
+      >
         eBilet
-      </RouterLink>
+      </router-link>
 
-      <SearchBar class="header-widget__search" />
+      <Search class="header-widget__search" />
 
       <nav class="header-widget__nav" aria-label="Основная навигация">
         <ul class="header-widget__menu">
           <li class="header-widget__menu-item">
-            <CityPicker />
+            <city-picker />
           </li>
 
           <template v-if="isAuthenticated">
             <li class="header-widget__menu-item">
-              <RouterLink to="/my-tickets" class="header-widget__link">
+              <router-link :to="{ name: RouteName.MyTickets }" class="header-widget__link">
                 Мои события
-              </RouterLink>
+              </router-link>
             </li>
             <li class="header-widget__menu-item">
-              <UserMenu
-                :user="user"
-                :avatar-url="avatarUrl"
-                @logout="handleLogout"
-              />
+              <user-menu />
             </li>
           </template>
 
@@ -45,46 +45,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useSessionStore } from '@/entities/Session';
 import { CityPicker } from '@/features/CityPicker';
-import { SearchBar } from '@/features/SearchBar';
+import { Search } from '@/features/Search';
 import { UserMenu } from '@/features/UserMenu';
-import { DEFAULT_AVATAR_URL } from '../config/constants';
-import { useHeader } from '../model/useHeader';
+import { RouteName } from '@/router';
 
-const {
-  user,
-  isAuthChecking,
-  isAuthenticated,
-  logout,
-} = useHeader();
+const sessionStore = useSessionStore();
+const { isChecking: isAuthChecking, isAuthenticated } = storeToRefs(sessionStore);
 
 const router = useRouter();
 
-const apiOrigin = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || '';
-
-const avatarUrl = computed(() => {
-  const source = user.value?.avatarUrl?.trim();
-
-  if (!source) {
-    return DEFAULT_AVATAR_URL;
-  }
-
-  if (source.startsWith('/uploads')) {
-    return apiOrigin ? `${apiOrigin}${source}` : source;
-  }
-
-  return source;
-});
-
 const handleLoginClick = () => {
-  void router.push('/profile');
-};
-
-const handleLogout = () => {
-  logout();
-  void router.push('/');
+  void router.push({ name: RouteName.Profile });
 };
 </script>
 

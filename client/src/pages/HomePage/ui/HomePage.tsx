@@ -15,7 +15,6 @@ const HomePage: React.FC = () => {
   const {
     loading,
     error,
-    filteredEvents,
     handleAddToFavorites,
     handleRemoveFromFavorites,
     handleBuyTicket,
@@ -42,14 +41,6 @@ const HomePage: React.FC = () => {
     <div className={styles.homePage}>
       <div className={styles.content}>
         <main className={styles.main}>
-          <EventListWidget
-            events={filteredEvents}
-            onAddToFavorites={handleAddToFavorites}
-            onRemoveFromFavorites={handleRemoveFromFavorites}
-            onBuyTicket={handleBuyTicket}
-            loading={loading}
-            error={error}
-          />
         </main>
       </div>
       <AuthAlertModal

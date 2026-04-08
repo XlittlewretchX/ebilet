@@ -1,48 +1,48 @@
 <template>
-  <section class="search-bar" aria-label="Поиск мероприятий">
-    <form class="search-bar__form" role="search" @submit.prevent>
-      <label
-        class="search-bar__label search-bar__label--hidden"
-        for="search-bar-input"
+  <section class="search-bar" aria-label="Поиск мероприятий" role="search">
+    <label
+      class="search-bar__label search-bar__label--hidden"
+      for="search-bar-input"
+    >
+      Поиск мероприятий
+    </label>
+    <div class="search-bar__field">
+      <input
+        id="search-bar-input"
+        v-model.trim="query"
+        class="search-bar__input"
+        type="search"
+        name="query"
+        autocomplete="off"
+        placeholder="Поиск мероприятий..."
+        @keydown.esc="handleClearQuery"
+      />
+      <button
+        v-if="query"
+        type="button"
+        class="search-bar__clear-button"
+        aria-label="Очистить поиск"
+        @click="handleClearQuery"
       >
-        Поиск мероприятий
-      </label>
-      <div class="search-bar__field">
-        <input
-          id="search-bar-input"
-          v-model.trim="search"
-          class="search-bar__input"
-          type="search"
-          name="search"
-          autocomplete="off"
-          placeholder="Поиск мероприятий..."
-          @keydown.esc="handleClearSearch"
-        />
-        <button
-          v-if="search"
-          type="button"
-          class="search-bar__clear-button"
-          aria-label="Очистить поиск"
-          @click="handleClearSearch"
-        >
-          &#10005;
-        </button>
-      </div>
-    </form>
+        &#10005;
+      </button>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { useSearchBarVue } from '../model/useSearchBarVue';
+import { storeToRefs } from 'pinia';
+import { useSearchStore } from '../model/searchStore';
 
-const { search, clearSearch } = useSearchBarVue();
+const searchStore = useSearchStore();
+const { query } = storeToRefs(searchStore);
 
-const handleClearSearch = () => {
-  if (!search.value) {
+const handleClearQuery = () => {
+  if (!query.value) {
     return;
   }
 
-  clearSearch();
+  searchStore.clearQuery();
 };
 </script>
 
@@ -53,12 +53,6 @@ const handleClearSearch = () => {
   justify-content: center;
   align-items: center;
   margin: 0.5rem 2rem;
-
-  &__form {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
 
   &__field {
     position: relative;
