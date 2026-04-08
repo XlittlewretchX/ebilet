@@ -2,14 +2,13 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/shared/lib/hooks';
 import { updateCity } from '@/features/AuthModal/model/authSlice';
-import { fetchCityByIP, setCity } from '@/features/ChangeCity/model/citySlice';
+import { fetchCityByIP, setCity } from '@/features/CityPicker/model/citySlice';
 import AuthModal from '@/features/AuthModal/ui/AuthModal';
-import CityPicker from '@/features/ChangeCity/ui/CityPicker';
+import CityPicker from '@/features/CityPicker/ui/CityPicker';
 import UserMenu from '@/features/UserMenu/ui/UserMenu';
 import { MobileMenu } from '@/features/MobileMenu/ui/MobileMenu';
 import { openMenu } from '@/features/MobileMenu/model/mobileMenuSlice';
 import styles from '@/widgets/Header/Header.module.scss';
-import SearchBar from '@/features/SearchBar/ui/SearchBar';
 import { MobileMenuIcon } from '@/shared/ui/icons';
 import type { RootState } from '@/app/store';
 
@@ -51,7 +50,6 @@ const Header: React.FC = () => {
         <Link to="/" className={styles.logo}>
           eBilet
         </Link>
-        <SearchBar />
         <nav className={styles.nav}>
           <CityPicker />
           {isAuthenticated ? (
