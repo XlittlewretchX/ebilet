@@ -44,7 +44,6 @@ import { computed, toRef } from 'vue';
 import type { Event } from '../model/types';
 import {
   formatEventDate,
-  parseEventDate,
   resolveEventImageUrl,
 } from '@/entities/Event/config/utils';
 
@@ -54,14 +53,10 @@ const props = defineProps<{
 
 const eventData = toRef(props, 'event');
 
-const parsedDate = computed(() => parseEventDate(eventData.value.date));
 const resolvedImageUrl = computed(() =>
   resolveEventImageUrl(eventData.value.imageUrl),
 );
-
-const formattedDate = computed(() => {
-  return formatEventDate(parsedDate.value, eventData.value.date);
-});
+const formattedDate = computed(() => formatEventDate(eventData.value.date));
 </script>
 
 <style scoped lang="scss">

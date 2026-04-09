@@ -1,16 +1,7 @@
 export const normalizeTicketCount = (rawValue: number): number => {
-  const parsedValue = Number(rawValue);
-  if (!Number.isFinite(parsedValue) || parsedValue < 0) {
+  if (!Number.isFinite(rawValue) || rawValue < 0) {
     return 0;
   }
 
-  return Math.trunc(parsedValue);
+  return Math.trunc(rawValue);
 };
-
-export const normalizeTicketSeats = (rawSeats: string[]): string[] =>
-  rawSeats
-    .map((seat) => seat.trim())
-    .filter((seat) => seat.length > 0);
-
-export const formatTicketSeats = (ticketSeats: string[]): string =>
-  ticketSeats.join(', ');

@@ -1,25 +1,17 @@
 <template>
-  <section
-    v-if="hasTicketMeta"
-    class="event-card-meta"
-    aria-label="Информация о купленных билетах"
-  >
-    <p v-if="normalizedTicketCount > 0" class="event-card-meta__text">
+  <section class="event-card-meta" aria-label="Информация о купленных билетах">
+    <p v-if="normalizedTicketCount" class="event-card-meta__text">
       Куплено билетов: <strong>{{ normalizedTicketCount }}</strong>
     </p>
-    <p v-if="hasTicketSeats" class="event-card-meta__text">
-      Места: <strong>{{ joinedTicketSeats }}</strong>
+    <p v-if="props.ticketSeats.length" class="event-card-meta__text">
+      Места: <strong>{{ props.ticketSeats.join(', ') }}</strong>
     </p>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
-import {
-  formatTicketSeats,
-  normalizeTicketCount,
-  normalizeTicketSeats,
-} from '../config/utils';
+import { computed } from 'vue';
+import { normalizeTicketCount } from '../config/utils';
 
 const props = withDefaults(
   defineProps<{
@@ -32,24 +24,8 @@ const props = withDefaults(
   },
 );
 
-const ticketCount = toRef(props, 'ticketCount');
-const ticketSeats = computed(() =>
-  Array.isArray(props.ticketSeats) ? props.ticketSeats : [],
-);
-
 const normalizedTicketCount = computed(() =>
-  normalizeTicketCount(ticketCount.value),
-);
-const normalizedTicketSeats = computed(() =>
-  normalizeTicketSeats(ticketSeats.value),
-);
-const hasTicketSeats = computed(() => normalizedTicketSeats.value.length > 0);
-const hasTicketMeta = computed(
-  () => normalizedTicketCount.value > 0 || hasTicketSeats.value,
-);
-
-const joinedTicketSeats = computed(() =>
-  formatTicketSeats(normalizedTicketSeats.value),
+  normalizeTicketCount(props.ticketCount),
 );
 </script>
 

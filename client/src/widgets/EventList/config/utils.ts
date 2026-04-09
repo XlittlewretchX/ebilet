@@ -1,16 +1,13 @@
 import type { Event } from '@/entities/Event';
 import type { FilterState } from '@/features/FilterPanel/model/types';
 
-export const normalizeEvents = (payload: unknown): Event[] => {
+export const normalizeEvents = (payload: Event[] | { events: Event[] }): Event[] => {
   if (Array.isArray(payload)) {
-    return payload as Event[];
+    return payload;
   }
 
-  if (payload && typeof payload === 'object') {
-    const maybeEvents = payload as { events?: unknown };
-    if (Array.isArray(maybeEvents.events)) {
-      return maybeEvents.events as Event[];
-    }
+  if (payload && typeof payload === 'object' && 'events' in payload) {
+    return Array.isArray(payload.events) ? payload.events : [];
   }
 
   return [];

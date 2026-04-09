@@ -1,16 +1,12 @@
 const DATE_LOCALE = 'ru-RU';
 
-export const parseEventDate = (rawDate: string): Date => new Date(rawDate);
-
-export const isValidEventDate = (date: Date): boolean =>
-  !Number.isNaN(date.getTime());
-
-export const formatEventDate = (date: Date, fallbackValue: string): string => {
-  if (!isValidEventDate(date)) {
-    return fallbackValue;
+export const formatEventDate = (rawDate: string): string => {
+  const parsedDate = new Date(rawDate);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return rawDate;
   }
 
-  return date.toLocaleDateString(DATE_LOCALE, {
+  return parsedDate.toLocaleDateString(DATE_LOCALE, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

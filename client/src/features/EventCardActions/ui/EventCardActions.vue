@@ -1,13 +1,13 @@
 <template>
   <section class="event-card-actions" aria-label="Действия с событием">
-    <template v-if="!isTicket">
+    <template v-if="!props.ticket">
       <button
         type="button"
         :class="[
           'event-card-actions__button',
           'event-card-actions__button--favorite',
           {
-            'event-card-actions__button--favorite-active': isFavorite,
+            'event-card-actions__button--favorite-active': props.favorite,
           },
         ]"
         @click="handleFavoriteClick"
@@ -18,7 +18,7 @@
       <button
         type="button"
         class="event-card-actions__button event-card-actions__button--buy"
-        @click="handleBuyTicket"
+        @click="emit('buy-ticket', props.eventId)"
       >
         Купить билет
       </button>
@@ -31,17 +31,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed } from 'vue';
 
 const props = withDefaults(
   defineProps<{
     eventId: number;
-    isFavorite?: boolean;
-    isTicket?: boolean;
+    favorite?: boolean;
+    ticket?: boolean;
   }>(),
   {
-    isFavorite: false,
-    isTicket: false,
+    favorite: false,
+    ticket: false,
   },
 );
 
@@ -51,30 +51,15 @@ const emit = defineEmits<{
   (event: 'buy-ticket', id: number): void;
 }>();
 
-const eventId = toRef(props, 'eventId');
-const isFavorite = computed(() => props.isFavorite);
-const isTicket = computed(() => props.isTicket);
-const favoriteAction = computed<'add-to-favorites' | 'remove-from-favorites'>(() =>
-  isFavorite.value ? 'remove-from-favorites' : 'add-to-favorites',
-);
 const favoriteButtonText = computed(() =>
-  isFavorite.value ? 'Из избранного' : 'В избранное',
+  props.favorite ? 'Из избранного' : 'В избранное',
 );
-
-const emitFavoriteAction = (action: 'add-to-favorites' | 'remove-from-favorites') => {
-  emit(action, eventId.value);
-};
-
-const emitBuyTicket = () => {
-  emit('buy-ticket', eventId.value);
-};
 
 const handleFavoriteClick = () => {
-  emitFavoriteAction(favoriteAction.value);
-};
-
-const handleBuyTicket = () => {
-  emitBuyTicket();
+  emit(
+    props.favorite ? 'remove-from-favorites' : 'add-to-favorites',
+    props.eventId,
+  );
 };
 </script>
 

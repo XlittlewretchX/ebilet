@@ -1,6 +1,6 @@
 <template>
   <section class="event-list" aria-label="Список мероприятий">
-    <p v-if="loading" class="event-list__state event-list__state--loading">
+    <p v-if="isLoading" class="event-list__state event-list__state--loading">
       Загрузка...
     </p>
 
@@ -18,18 +18,18 @@
         :key="eventItem.id"
         class="event-list__item"
       >
-        <EventEntityCard :event="eventItem">
+        <event-entity-card :event="eventItem">
           <template #actions>
-            <EventCardActions
+            <event-card-actions
               :event-id="eventItem.id"
-              :is-favorite="Boolean(eventItem.isFavorite)"
-              :is-ticket="Boolean(eventItem.isTicket)"
-              @add-to-favorites="handleAddToFavorites"
-              @remove-from-favorites="handleRemoveFromFavorites"
+              :favorite="Boolean(eventItem.favorite)"
+              :ticket="Boolean(eventItem.ticket)"
+              @add-to-favorites="handleFavoriteAction(FavoriteAction.Add, $event)"
+              @remove-from-favorites="handleFavoriteAction(FavoriteAction.Remove, $event)"
               @buy-ticket="handleBuyTicket"
             />
           </template>
-        </EventEntityCard>
+        </event-entity-card>
       </li>
     </ul>
   </section>
@@ -37,14 +37,15 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { computed, toRef, watch } from 'vue';
+import { watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { EventCard as EventEntityCard } from '@/entities/Event';
 import { useCityStore } from '@/entities/City';
 import { useSessionStore } from '@/entities/Session';
 import type { FilterState } from '@/features/FilterPanel';
 import { EventCardActions } from '@/features/EventCardActions';
-import { useEventList } from '../model/useEventList';
+import { RouteName } from '@/router';
+import { FavoriteAction, useEventList } from '../model/useEventList';
 
 const props = withDefaults(
   defineProps<{
@@ -56,8 +57,6 @@ const props = withDefaults(
   },
 );
 
-const activeFilters = toRef(props, 'activeFilters');
-const searchQuery = computed(() => props.searchQuery);
 const router = useRouter();
 const cityStore = useCityStore();
 const sessionStore = useSessionStore();
@@ -65,80 +64,62 @@ const sessionStore = useSessionStore();
 const { user } = storeToRefs(sessionStore);
 
 const {
-  loading,
+  isLoading,
   error,
   events,
   loadEvents,
-  setFavoriteIds,
-  addToFavorites,
-  removeFromFavorites,
-} = useEventList();
+  updateFavoriteIds,
+} = useEventList({
+  favoriteIds: () => user.value?.favorites,
+});
 
 watch(
-  () => [
-    activeFilters.value.category,
-    activeFilters.value.subcategory,
-    activeFilters.value.dateRange.start,
-    activeFilters.value.dateRange.end,
-    activeFilters.value.priceRange.min,
-    activeFilters.value.priceRange.max,
-    activeFilters.value.onlyMyCity,
-    searchQuery.value,
-    cityStore.name,
-  ],
+  () => ({
+    activeFilters: props.activeFilters,
+    searchQuery: props.searchQuery,
+    cityName: cityStore.name,
+  }),
   () => {
     void loadEvents({
-      activeFilters: activeFilters.value,
-      searchQuery: searchQuery.value,
+      activeFilters: props.activeFilters,
+      searchQuery: props.searchQuery,
       cityName: cityStore.name,
     });
   },
-  { immediate: true },
+  { deep: true, immediate: true },
 );
 
-watch(
-  () => user.value?.favorites,
-  (favoriteIds) => {
-    setFavoriteIds(favoriteIds ?? []);
-  },
-  { immediate: true },
-);
-
-const handleAddToFavorites = async (eventId: number) => {
-  if (!sessionStore.isAuthenticated) {
+const handleFavoriteAction = async (
+  action: FavoriteAction,
+  eventId: number,
+) => {
+  if (!sessionStore.isAuthenticated || !sessionStore.user) {
     return;
   }
 
-  const isAdded = await addToFavorites(eventId);
-  if (!isAdded || !sessionStore.user) {
-    return;
-  }
+  const nextFavoriteIds = await updateFavoriteIds({
+    action,
+    eventId,
+    currentFavoriteIds: sessionStore.user.favorites ?? [],
+  });
 
-  const existingFavorites = sessionStore.user.favorites ?? [];
-  sessionStore.user = {
-    ...sessionStore.user,
-    favorites: Array.from(new Set([...existingFavorites, eventId])),
-  };
-};
-
-const handleRemoveFromFavorites = async (eventId: number) => {
-  if (!sessionStore.isAuthenticated) {
-    return;
-  }
-
-  const isRemoved = await removeFromFavorites(eventId);
-  if (!isRemoved || !sessionStore.user) {
+  if (!nextFavoriteIds) {
     return;
   }
 
   sessionStore.user = {
     ...sessionStore.user,
-    favorites: (sessionStore.user.favorites ?? []).filter((id) => id !== eventId),
+    favorites: nextFavoriteIds,
   };
 };
 
 const handleBuyTicket = (eventId: number) => {
-  void router.push(`/buy/${eventId}`);
+  void router.push({
+    name: RouteName.BuyTicket,
+    params: {
+      eventId: String(eventId),
+    },
+  });
 };
 </script>
 
