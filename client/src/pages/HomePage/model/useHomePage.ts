@@ -1,6 +1,6 @@
 import { useAppSelector, useAppDispatch } from '@/shared/lib/hooks';
 import { fetchEvents } from '@/entities/Event/model/eventSlice';
-import { setFilters } from '@/features/Filters/filterSlice';
+import { setFilters } from '@/features/FilterPanel/filterPanelSlice';
 import { useEffect, useState } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
 import { useDebounce } from '@/shared/lib/hooks';

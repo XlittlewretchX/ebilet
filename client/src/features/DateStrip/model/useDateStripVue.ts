@@ -1,4 +1,4 @@
-import { ref, watch, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import type { DatePickerValue, DateRange, SelectedDateRange } from './types';
 import { formatDate, parseDateValue } from '../config/utils';
 
@@ -14,10 +14,35 @@ export const useDateStripVue = ({
   const today = new Date();
 
   const calendarOpen = ref(false);
-  const selectedDate = ref<Date | null>(null);
-  const selectedRange = ref<DateRange>([null, null]);
   const month = ref(today.getMonth());
   const year = ref(today.getFullYear());
+
+  const parsedSelection = computed(() => {
+    const start = parseDateValue(modelValue.value.start);
+    const end = parseDateValue(modelValue.value.end);
+
+    return {
+      start,
+      end,
+      isSingleDay:
+        Boolean(start && end) && modelValue.value.start === modelValue.value.end,
+    };
+  });
+
+  const selectedDate = computed<Date | null>(() => {
+    const { start, isSingleDay } = parsedSelection.value;
+    return isSingleDay ? start : null;
+  });
+
+  const selectedRange = computed<DateRange>(() => {
+    const { start, end, isSingleDay } = parsedSelection.value;
+
+    if (!start || isSingleDay) {
+      return [null, null];
+    }
+
+    return [start, end ?? null];
+  });
 
   const openCalendar = () => {
     calendarOpen.value = true;
@@ -31,39 +56,17 @@ export const useDateStripVue = ({
     modelValue,
     (nextRange) => {
       const startDate = parseDateValue(nextRange.start);
-      const endDate = parseDateValue(nextRange.end);
-
-      if (startDate && endDate) {
-        if (nextRange.start === nextRange.end) {
-          selectedDate.value = startDate;
-          selectedRange.value = [null, null];
-        } else {
-          selectedDate.value = null;
-          selectedRange.value = [startDate, endDate];
-        }
-
-        month.value = startDate.getMonth();
-        year.value = startDate.getFullYear();
+      if (!startDate) {
         return;
       }
 
-      if (startDate) {
-        selectedDate.value = null;
-        selectedRange.value = [startDate, null];
-        month.value = startDate.getMonth();
-        year.value = startDate.getFullYear();
-        return;
-      }
-
-      selectedDate.value = null;
-      selectedRange.value = [null, null];
+      month.value = startDate.getMonth();
+      year.value = startDate.getFullYear();
     },
     { immediate: true, deep: true },
   );
 
   const handleDateClick = (date: Date) => {
-    selectedDate.value = date;
-    selectedRange.value = [null, null];
     month.value = date.getMonth();
     year.value = date.getFullYear();
 
@@ -83,8 +86,6 @@ export const useDateStripVue = ({
         return;
       }
 
-      selectedRange.value = [start, end];
-      selectedDate.value = null;
       month.value = start.getMonth();
       year.value = start.getFullYear();
 
@@ -101,8 +102,6 @@ export const useDateStripVue = ({
     }
 
     if (value instanceof Date) {
-      selectedDate.value = value;
-      selectedRange.value = [null, null];
       month.value = value.getMonth();
       year.value = value.getFullYear();
 
@@ -139,8 +138,6 @@ export const useDateStripVue = ({
   };
 
   const handleClear = () => {
-    selectedDate.value = null;
-    selectedRange.value = [null, null];
     closeCalendar();
 
     onDateRangeChange({

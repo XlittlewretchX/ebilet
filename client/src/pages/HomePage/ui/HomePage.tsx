@@ -1,10 +1,10 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '@/shared/lib/hooks';
 import { fetchEvents } from '@/entities/Event/model/eventSlice';
-import { setFilters, resetFilters } from '@/features/Filters/filterSlice';
+import { setFilters, resetFilters } from '@/features/FilterPanel/filterPanelSlice';
 import { useEffect } from 'react';
 import { useEventList } from '@/features/EventList/model/useEventList';
-import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
+import EventList from '@/widgets/EventList/ui/EventList';
 import styles from '@/pages/HomePage/HomePage.module.scss';
 import { useHomePage } from '../model/useHomePage';
 import AuthModal from '@/features/AuthModal/ui/AuthModal';

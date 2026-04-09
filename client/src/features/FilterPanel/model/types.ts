@@ -12,7 +12,7 @@ export interface FilterState {
   onlyMyCity: boolean;
 }
 
-export const createInitialFilterState = (): FilterState => ({
+export const createDefaultFilters = (): FilterState => ({
   category: 'all',
   subcategory: '',
   dateRange: { start: '', end: '' },

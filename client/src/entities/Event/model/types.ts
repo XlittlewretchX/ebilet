@@ -8,4 +8,4 @@ export interface Event {
   imageUrl?: string;
   category: string;
   userId: number;
-} 
+}
