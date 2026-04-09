@@ -9,8 +9,6 @@
         eBilet
       </router-link>
 
-      <Search class="header-widget__search" />
-
       <nav class="header-widget__nav" aria-label="Основная навигация">
         <ul class="header-widget__menu">
           <li class="header-widget__menu-item">
@@ -49,7 +47,6 @@ import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useSessionStore } from '@/entities/Session';
 import { CityPicker } from '@/features/CityPicker';
-import { Search } from '@/features/Search';
 import { UserMenu } from '@/features/UserMenu';
 import { RouteName } from '@/router';
 
@@ -73,7 +70,7 @@ const handleLoginClick = () => {
 
   &__container {
     display: grid;
-    grid-template-columns: auto minmax(180px, 1fr) auto;
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 1rem;
     max-width: 1200px;
@@ -95,10 +92,6 @@ const handleLoginClick = () => {
 
   &__logo:hover {
     color: #007bff;
-  }
-
-  &__search {
-    min-width: 0;
   }
 
   &__nav {
@@ -155,16 +148,6 @@ const handleLoginClick = () => {
 
 @media (max-width: 960px) {
   .header-widget {
-    &__container {
-      grid-template-columns: auto 1fr;
-      row-gap: 0.5rem;
-    }
-
-    &__search {
-      grid-column: 1 / -1;
-      order: 1;
-    }
-
     &__nav {
       justify-self: end;
     }
@@ -180,10 +163,6 @@ const handleLoginClick = () => {
 
     &__logo {
       justify-self: center;
-    }
-
-    &__search {
-      order: 0;
     }
 
     &__nav {

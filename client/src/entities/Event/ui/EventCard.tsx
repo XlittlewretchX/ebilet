@@ -1,5 +1,5 @@
 import React from 'react';
-import { Event } from '@/entities/Event/types';
+import { Event } from '@/entities/Event/model/types';
 import styles from './EventCard.module.scss';
 
 interface EventCardProps {

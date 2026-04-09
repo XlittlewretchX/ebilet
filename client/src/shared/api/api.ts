@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { User, Event } from '../types';
-import type { FilterState } from '@/features/Filters/filterSlice';
+import type { FilterState } from '@/features/FilterPanel/model/types';
 
 const API_URL = process.env.REACT_APP_API_URL;
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './MyTicketPage.module.scss';
 import { useAppSelector, useAppDispatch } from '@/shared/lib/hooks';
-import EventListWidget from '@/widgets/EventListWidget/ui/EventListWidget';
+import EventList from '@/widgets/EventList/ui/EventList';
 import { fetchFavorites, fetchUserTickets, removeFavorite } from '@/features/AuthModal/model/authSlice';
 import { fetchEvents } from '@/entities/Event/model/eventSlice';
 
@@ -69,7 +69,7 @@ const MyTicketsPage: React.FC = () => {
       <div className={styles.tabContent}>
         {activeTab === 'tickets' ? (
           ticketsForWidget.length > 0 ? (
-            <EventListWidget
+            <EventList
               events={ticketsForWidget.map(ticket => ({
                 ...ticket,
                 id: ticket.eventId,
@@ -89,7 +89,7 @@ const MyTicketsPage: React.FC = () => {
           )
         ) : (
           favoriteEvents.length > 0 ? (
-            <EventListWidget
+            <EventList
               events={favoriteEvents}
               onAddToFavorites={() => {}}
               onRemoveFromFavorites={handleRemoveFromFavorites}

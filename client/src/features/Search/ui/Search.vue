@@ -9,7 +9,7 @@
     <div class="search-bar__field">
       <input
         id="search-bar-input"
-        v-model.trim="query"
+        v-model.trim="queryModel"
         class="search-bar__input"
         type="search"
         name="query"
@@ -18,7 +18,7 @@
         @keydown.esc="handleClearQuery"
       />
       <button
-        v-if="query"
+        v-if="queryModel"
         type="button"
         class="search-bar__clear-button"
         aria-label="Очистить поиск"
@@ -31,18 +31,32 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useSearchStore } from '../model/searchStore';
+import { computed } from 'vue';
 
-const searchStore = useSearchStore();
-const { query } = storeToRefs(searchStore);
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string;
+  }>(),
+  {
+    modelValue: '',
+  },
+);
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string): void;
+}>();
+
+const queryModel = computed({
+  get: () => props.modelValue,
+  set: (nextValue: string) => emit('update:modelValue', nextValue),
+});
 
 const handleClearQuery = () => {
-  if (!query.value) {
+  if (!queryModel.value) {
     return;
   }
 
-  searchStore.clearQuery();
+  emit('update:modelValue', '');
 };
 </script>
 
