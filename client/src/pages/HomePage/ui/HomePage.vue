@@ -9,15 +9,15 @@
 
       <div class="home-page__layout">
         <aside class="home-page__sidebar" aria-label="Фильтры">
-          <FilterPanel v-model="activeFilters" />
+          <filter-panel v-model="activeFilters" />
         </aside>
 
         <section class="home-page__content" aria-label="Лента мероприятий">
-          <Search v-model="searchQuery" class="home-page__search" />
+          <search-feature v-model="searchQuery" class="home-page__search" />
 
-          <DateStrip v-model="activeFilters.dateRange" />
+          <date-strip v-model="activeFilters.dateRange" />
 
-          <EventList
+          <event-list
             class="home-page__events"
             :active-filters="activeFilters"
             :search-query="searchQuery"
@@ -32,7 +32,7 @@
 import { ref } from 'vue';
 import DateStrip from '@/features/DateStrip';
 import FilterPanel from '@/features/FilterPanel';
-import { Search } from '@/features/Search';
+import { Search as SearchFeature } from '@/features/Search';
 import { createDefaultFilters, type FilterState } from '@/features/FilterPanel';
 import { EventList } from '@/widgets/EventList';
 

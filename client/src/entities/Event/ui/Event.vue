@@ -1,9 +1,9 @@
 <template>
   <article class="event-card">
-    <figure v-if="resolvedImageUrl" class="event-card__image-wrap">
+    <figure v-if="resolveEventImageUrl(props.event.imageUrl)" class="event-card__image-wrap">
       <img
-        :src="resolvedImageUrl"
-        :alt="eventData.title"
+        :src="resolveEventImageUrl(props.event.imageUrl)"
+        :alt="props.event.title"
         class="event-card__image"
         loading="lazy"
       />
@@ -11,20 +11,20 @@
 
     <section class="event-card__content">
       <header class="event-card__header">
-        <h3 class="event-card__title">{{ eventData.title }}</h3>
+        <h3 class="event-card__title">{{ props.event.title }}</h3>
       </header>
 
-      <p class="event-card__description">{{ eventData.description }}</p>
+      <p class="event-card__description">{{ props.event.description }}</p>
 
       <ul class="event-card__details" aria-label="Детали события">
         <li class="event-card__detail event-card__detail--date">
-          <time :datetime="eventData.date">{{ formattedDate }}</time>
+          <time :datetime="props.event.date">{{ formattedDate }}</time>
         </li>
         <li class="event-card__detail event-card__detail--location">
-          <address class="event-card__location">{{ eventData.location }}</address>
+          <address class="event-card__location">{{ props.event.location }}</address>
         </li>
         <li class="event-card__detail event-card__detail--price">
-          <data :value="eventData.price">{{ eventData.price }} ₽</data>
+          <data :value="props.event.price">{{ props.event.price }} ₽</data>
         </li>
       </ul>
 
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed } from 'vue';
 import type { Event } from '../model/types';
 import {
   formatEventDate,
@@ -51,12 +51,7 @@ const props = defineProps<{
   event: Event;
 }>();
 
-const eventData = toRef(props, 'event');
-
-const resolvedImageUrl = computed(() =>
-  resolveEventImageUrl(eventData.value.imageUrl),
-);
-const formattedDate = computed(() => formatEventDate(eventData.value.date));
+const formattedDate = computed(() => formatEventDate(props.event.date));
 </script>
 
 <style scoped lang="scss">
