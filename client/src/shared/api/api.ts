@@ -11,6 +11,21 @@ const api = axios.create({
   },
 });
 
+export interface LoginPayload {
+  username: string;
+  password: string;
+}
+
+export interface RegisterPayload extends LoginPayload {
+  email: string;
+  city: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -20,17 +35,12 @@ api.interceptors.request.use((config) => {
 });
 
 export const authAPI = {
-  register: async (userData: {
-    username: string;
-    email: string;
-    password: string;
-    city: string;
-  }) => {
+  register: async (userData: RegisterPayload): Promise<AuthResponse> => {
     const response = await api.post('/auth/register', userData);
     return response.data;
   },
 
-  login: async (credentials: { username: string; password: string }) => {
+  login: async (credentials: LoginPayload): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', credentials);
     return response.data;
   },
@@ -81,7 +91,7 @@ export const authAPI = {
     return response.data;
   },
 
-  checkAuth: async () => {
+  checkAuth: async (): Promise<AuthResponse> => {
     const response = await api.get('/auth/check');
     return response.data;
   },

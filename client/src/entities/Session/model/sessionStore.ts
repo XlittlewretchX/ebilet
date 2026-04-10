@@ -1,26 +1,17 @@
 import { defineStore } from 'pinia';
+import type { LoginPayload, RegisterPayload } from '@/shared/api/api';
 import { authAPI } from '@/shared/api/api';
 import type { User } from '@/shared/types';
-
-interface LoginPayload {
-  username: string;
-  password: string;
-}
-
-interface RegisterPayload extends LoginPayload {
-  email: string;
-  city: string;
-}
-
-interface AuthResponse {
-  token: string;
-  user: User;
-}
 
 interface SessionState {
   user: User | null;
   isChecking: boolean;
   isSubmitting: boolean;
+}
+
+interface AuthResult {
+  success: boolean;
+  errorMessage?: string;
 }
 
 export const useSessionStore = defineStore('session', {
@@ -38,34 +29,46 @@ export const useSessionStore = defineStore('session', {
       this.user = null;
       this.isSubmitting = false;
     },
-    async login(credentials: LoginPayload): Promise<string | null> {
+    async login(credentials: LoginPayload): Promise<AuthResult> {
       this.isSubmitting = true;
 
       try {
-        const response = await authAPI.login(credentials) as AuthResponse;
+        const response = await authAPI.login(credentials);
 
         localStorage.setItem('token', response.token);
         this.user = response.user;
 
-        return null;
+        return {
+          success: true,
+        };
       } catch (error: any) {
-        return error?.response?.data?.message || error?.message || 'Ошибка при входе';
+        return {
+          success: false,
+          errorMessage:
+            error?.response?.data?.message || error?.message || 'Ошибка при входе',
+        };
       } finally {
         this.isSubmitting = false;
       }
     },
-    async register(userData: RegisterPayload): Promise<string | null> {
+    async register(userData: RegisterPayload): Promise<AuthResult> {
       this.isSubmitting = true;
 
       try {
-        const response = await authAPI.register(userData) as AuthResponse;
+        const response = await authAPI.register(userData);
 
         localStorage.setItem('token', response.token);
         this.user = response.user;
 
-        return null;
+        return {
+          success: true,
+        };
       } catch (error: any) {
-        return error?.response?.data?.message || error?.message || 'Ошибка при регистрации';
+        return {
+          success: false,
+          errorMessage:
+            error?.response?.data?.message || error?.message || 'Ошибка при регистрации',
+        };
       } finally {
         this.isSubmitting = false;
       }
@@ -85,7 +88,7 @@ export const useSessionStore = defineStore('session', {
       this.isChecking = true;
 
       try {
-        const response = await authAPI.checkAuth() as AuthResponse;
+        const response = await authAPI.checkAuth();
         localStorage.setItem('token', response.token);
         this.user = response.user;
       } catch {

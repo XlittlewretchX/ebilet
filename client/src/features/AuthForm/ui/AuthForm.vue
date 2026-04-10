@@ -2,35 +2,26 @@
   <section class="auth-form" aria-labelledby="auth-form-title">
     <header class="auth-form__header">
       <h1 id="auth-form-title" class="auth-form__title">
-        {{ mode === 'login' ? 'Вход в аккаунт' : 'Регистрация аккаунта' }}
+        {{ titleText }}
       </h1>
       <p class="auth-form__description">
-        {{ mode === 'login' ? 'Войдите, чтобы управлять билетами и избранным.' : 'Создайте аккаунт, чтобы покупать билеты и сохранять события.' }}
+        {{ descriptionText }}
       </p>
     </header>
 
     <nav class="auth-form__mode-switch" aria-label="Переключение режима формы">
       <button
+        v-for="modeOption in authModeOptions"
+        :key="modeOption.value"
         type="button"
         :class="[
           'auth-form__mode-button',
-          { 'auth-form__mode-button--active': mode === 'login' },
+          { 'auth-form__mode-button--active': mode === modeOption.value },
         ]"
-        :aria-pressed="mode === 'login'"
-        @click="switchMode('login')"
+        :aria-pressed="mode === modeOption.value"
+        @click="toggleMode(modeOption.value)"
       >
-        Вход
-      </button>
-      <button
-        type="button"
-        :class="[
-          'auth-form__mode-button',
-          { 'auth-form__mode-button--active': mode !== 'login' },
-        ]"
-        :aria-pressed="mode !== 'login'"
-        @click="switchMode('register')"
-      >
-        Регистрация
+        {{ modeOption.label }}
       </button>
     </nav>
 
@@ -66,7 +57,7 @@
         <label class="auth-form__label" for="auth-form-password">Пароль</label>
         <input
           id="auth-form-password"
-          v-model="formState.password"
+          v-model.trim="formState.password"
           class="auth-form__input"
           type="password"
           name="password"
@@ -81,10 +72,10 @@
           </label>
           <input
             id="auth-form-confirm-password"
-            v-model="formState.confirmPassword"
+            v-model.trim="formState.confirmPassword"
             class="auth-form__input"
             type="password"
-            name="confirmPassword"
+            name="confirm-password"
             autocomplete="new-password"
             minlength="6"
             required
@@ -106,9 +97,19 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { DEFAULT_CITY, useCityStore } from '@/entities/City';
+import { useSessionStore } from '@/entities/Session';
 import { RouteName } from '@/shared/config/routeNames';
-import { useAuthForm } from '../model/useAuthForm';
-import type { AuthMode } from '../model/useAuthForm';
+
+type AuthMode = 'login' | 'register';
+
+const authModeOptions: { value: AuthMode; label: string }[] = [
+  { value: 'login', label: 'Вход' },
+  { value: 'register', label: 'Регистрация' },
+];
 
 const props = withDefaults(
   defineProps<{
@@ -123,19 +124,80 @@ const props = withDefaults(
   },
 );
 
-const {
-  formState,
-  mode,
-  submitLabel,
-  errorText,
-  isSubmitting,
-  switchMode,
-  submit,
-} = useAuthForm({
-  initialMode: props.initialMode,
-  redirectName: props.redirectName,
-  redirectParams: props.redirectParams,
+const router = useRouter();
+const cityStore = useCityStore();
+const sessionStore = useSessionStore();
+const { isSubmitting } = storeToRefs(sessionStore);
+
+const mode = ref<AuthMode>(props.initialMode);
+const errorText = ref('');
+const formState = ref({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
 });
+const loginMode = computed(() => mode.value === 'login');
+
+const titleText = computed(() =>
+  loginMode.value ? 'Вход в аккаунт' : 'Регистрация аккаунта',
+);
+
+const descriptionText = computed(() =>
+  loginMode.value
+    ? 'Войдите, чтобы управлять билетами и избранным.'
+    : 'Создайте аккаунт, чтобы покупать билеты и сохранять события.',
+);
+
+const submitLabel = computed(() => {
+  if (isSubmitting.value) {
+    return loginMode.value ? 'Входим...' : 'Регистрируем...';
+  }
+
+  return loginMode.value ? 'Войти' : 'Зарегистрироваться';
+});
+
+const toggleMode = (nextMode: AuthMode) => {
+  if (mode.value === nextMode) {
+    return;
+  }
+
+  mode.value = nextMode;
+  errorText.value = '';
+  formState.value.password = '';
+  formState.value.confirmPassword = '';
+};
+
+const submit = async () => {
+  errorText.value = '';
+
+  if (!loginMode.value && formState.value.password !== formState.value.confirmPassword) {
+    errorText.value = 'Пароли не совпадают';
+    return;
+  }
+
+  const result = loginMode.value
+    ? await sessionStore.login({
+        username: formState.value.username,
+        password: formState.value.password,
+      })
+    : await sessionStore.register({
+        username: formState.value.username,
+        email: formState.value.email,
+        password: formState.value.password,
+        city: cityStore.name || DEFAULT_CITY,
+      });
+
+  if (!result.success) {
+    errorText.value = result.errorMessage || 'Произошла ошибка';
+    return;
+  }
+
+  await router.push({
+    name: props.redirectName,
+    params: props.redirectParams,
+  });
+};
 </script>
 
 <style scoped lang="scss">

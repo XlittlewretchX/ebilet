@@ -24,15 +24,63 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { AuthForm } from '@/features/AuthForm';
-import { useAuthPage } from '../model/useAuthPage';
+import { useSessionStore } from '@/entities/Session';
+import { RouteName } from '@/shared/config/routeNames';
 
-const {
-  initialMode,
-  redirectName,
-  redirectParams,
-  formKey,
-} = useAuthPage();
+const route = useRoute();
+const router = useRouter();
+const sessionStore = useSessionStore();
+const { isChecking } = storeToRefs(sessionStore);
+
+const initialMode = computed(() =>
+  route.query.mode === 'register' ? 'register' : 'login',
+);
+
+const redirectName = computed<RouteName>(() => {
+  const queryName = route.query['redirect-name'];
+  return queryName === RouteName.BuyTicket || queryName === RouteName.Profile
+    ? queryName
+    : RouteName.MyTickets;
+});
+
+const redirectParams = computed<Record<string, string>>(() => {
+  const params: Record<string, string> = {};
+
+  if (redirectName.value !== RouteName.BuyTicket) {
+    return params;
+  }
+
+  const eventId = route.query['redirect-event-id'];
+
+  if (typeof eventId === 'string' && eventId) {
+    params.eventId = eventId;
+  }
+
+  return params;
+});
+
+const formKey = computed(
+  () => `${initialMode.value}:${redirectName.value}:${redirectParams.value.eventId ?? ''}`,
+);
+
+watch(
+  [() => sessionStore.isAuthenticated, isChecking],
+  async ([authenticated, checking]) => {
+    if (checking || !authenticated) {
+      return;
+    }
+
+    await router.replace({
+      name: redirectName.value,
+      params: redirectParams.value,
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <style scoped lang="scss">
