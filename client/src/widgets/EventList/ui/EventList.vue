@@ -44,7 +44,7 @@ import { useCityStore } from '@/entities/City';
 import { useSessionStore } from '@/entities/Session';
 import type { FilterState } from '@/features/FilterPanel';
 import { EventCardActions } from '@/features/EventCardActions';
-import { RouteName } from '@/router';
+import { RouteName } from '@/shared/config/routeNames';
 import { FavoriteAction, useEventList } from '../model/useEventList';
 
 const props = withDefaults(
