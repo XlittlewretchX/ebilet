@@ -2,7 +2,7 @@
   <header class="header-widget">
     <div class="header-widget__container">
       <router-link
-        :to="{ name: RouteName.Home }"
+        :to="{ name: RouteName.Home, params: {} }"
         class="header-widget__logo"
         aria-label="Перейти на главную"
       >
@@ -17,7 +17,7 @@
 
           <template v-if="isAuthenticated">
             <li class="header-widget__menu-item">
-              <router-link :to="{ name: RouteName.MyTickets }" class="header-widget__link">
+              <router-link :to="{ name: RouteName.MyTickets, params: {} }" class="header-widget__link">
                 Мои события
               </router-link>
             </li>
@@ -48,7 +48,7 @@ import { useRouter } from 'vue-router';
 import { useSessionStore } from '@/entities/Session';
 import { CityPicker } from '@/features/CityPicker';
 import { UserMenu } from '@/features/UserMenu';
-import { RouteName } from '@/router';
+import { RouteName } from '@/shared/config/routeNames';
 
 const sessionStore = useSessionStore();
 const { isChecking: isAuthChecking, isAuthenticated } = storeToRefs(sessionStore);
@@ -56,7 +56,10 @@ const { isChecking: isAuthChecking, isAuthenticated } = storeToRefs(sessionStore
 const router = useRouter();
 
 const handleLoginClick = () => {
-  void router.push({ name: RouteName.Profile });
+  void router.push({
+    name: RouteName.Auth,
+    params: {},
+  });
 };
 </script>
 

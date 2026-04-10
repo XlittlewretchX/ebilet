@@ -86,7 +86,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSessionStore } from '@/entities/Session';
-import { RouteName } from '@/router';
+import { RouteName } from '@/shared/config/routeNames';
 
 const DEFAULT_AVATAR_URL = process.env.REACT_APP_DEFAULT_AVATAR_URL || '/img/default-avatar.svg';
 const apiOrigin = process.env.REACT_APP_API_URL?.replace(/\/api\/?$/, '') || '';
