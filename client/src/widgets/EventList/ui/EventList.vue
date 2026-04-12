@@ -1,29 +1,37 @@
 <template>
   <section class="event-list" aria-label="Список мероприятий">
-    <p v-if="isLoading" class="event-list__state event-list__state--loading">
+    <p v-if="listState.isLoading" class="event-list__state event-list__state--loading">
       Загрузка...
     </p>
 
-    <p v-else-if="error" class="event-list__state event-list__state--error">
-      Ошибка: {{ error }}
+    <p v-else-if="listState.error" class="event-list__state event-list__state--error">
+      Ошибка: {{ listState.error }}
     </p>
 
-    <p v-else-if="!events.length" class="event-list__state event-list__state--empty">
-      Мероприятия не найдены по выбранным фильтрам
+    <p v-else-if="!listState.events.length" class="event-list__state event-list__state--empty">
+      {{ props.emptyMessage }}
     </p>
 
     <ul v-else class="event-list__grid">
       <li
-        v-for="eventItem in events"
+        v-for="eventItem in listState.events"
         :key="eventItem.id"
         class="event-list__item"
       >
-        <event-entity-card :event="eventItem">
+        <event-entity-card v-if="props.showTicketMeta" :event="eventItem">
+          <template #meta>
+            <event-card-meta
+              :ticket-count="eventItem.ticketCount"
+              :ticket-seats="eventItem.ticketSeats ?? []"
+            />
+          </template>
+        </event-entity-card>
+
+        <event-entity-card v-else :event="eventItem">
           <template #actions>
             <event-card-actions
               :event-id="eventItem.id"
               :favorite="Boolean(eventItem.favorite)"
-              :ticket="Boolean(eventItem.ticket)"
               @add-to-favorites="handleFavoriteAction(FavoriteAction.Add, $event)"
               @remove-from-favorites="handleFavoriteAction(FavoriteAction.Remove, $event)"
               @buy-ticket="handleBuyTicket"
@@ -37,23 +45,40 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { EventCard as EventEntityCard } from '@/entities/Event';
+import type { Event } from '@/entities/Event';
 import { useCityStore } from '@/entities/City';
 import { useSessionStore } from '@/entities/Session';
 import type { FilterState } from '@/features/FilterPanel';
 import { EventCardActions } from '@/features/EventCardActions';
+import { EventCardMeta } from '@/features/EventCardMeta';
 import { RouteName } from '@/shared/config/routeNames';
 import { FavoriteAction, useEventList } from '../model/useEventList';
 
+interface EventListItem extends Event {
+  favorite?: boolean;
+  ticketCount?: number;
+  ticketSeats?: string[];
+}
+
 const props = withDefaults(
   defineProps<{
-    activeFilters: FilterState;
+    activeFilters?: FilterState;
     searchQuery?: string;
+    events?: EventListItem[];
+    isLoading?: boolean;
+    error?: string | null;
+    emptyMessage?: string;
+    showTicketMeta?: boolean;
   }>(),
   {
     searchQuery: '',
+    isLoading: false,
+    error: null,
+    emptyMessage: 'Мероприятия не найдены по выбранным фильтрам',
+    showTicketMeta: false,
   },
 );
 
@@ -64,13 +89,33 @@ const sessionStore = useSessionStore();
 const { user } = storeToRefs(sessionStore);
 
 const {
-  isLoading,
-  error,
-  events,
+  isLoading: localIsLoading,
+  error: localError,
+  events: localEvents,
   loadEvents,
   updateFavoriteIds,
 } = useEventList({
   favoriteIds: () => user.value?.favorites,
+});
+
+const listState = computed<{
+  isLoading: boolean;
+  error: string | null;
+  events: EventListItem[];
+}>(() => {
+  if (Array.isArray(props.events)) {
+    return {
+      isLoading: Boolean(props.isLoading),
+      error: props.error,
+      events: props.events,
+    };
+  }
+
+  return {
+    isLoading: localIsLoading.value,
+    error: localError.value,
+    events: localEvents.value as EventListItem[],
+  };
 });
 
 watch(
@@ -78,8 +123,13 @@ watch(
     activeFilters: props.activeFilters,
     searchQuery: props.searchQuery,
     cityName: cityStore.name,
+    events: props.events,
   }),
   () => {
+    if (Array.isArray(props.events) || !props.activeFilters) {
+      return;
+    }
+
     void loadEvents({
       activeFilters: props.activeFilters,
       searchQuery: props.searchQuery,
