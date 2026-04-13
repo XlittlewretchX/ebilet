@@ -187,30 +187,20 @@ const syncFavoriteIdsToSession = (events: Event[]) => {
   };
 };
 
-const loadTickets = async () => {
-  const response = await authAPI.getUserTickets();
-  const rawTickets = Array.isArray(response) ? (response as UserTicketResponse[]) : [];
-
-  ticketEventsForList.value = buildTicketEventListItems(rawTickets);
-};
-
-const loadFavorites = async () => {
-  const response = await authAPI.getFavorites();
-  const rawFavorites = Array.isArray(response) ? (response as Event[]) : [];
-
-  favoriteEvents.value = rawFavorites;
-  syncFavoriteIdsToSession(rawFavorites);
-};
-
 const loadTabData = async (tab: (typeof MY_TICKETS_TABS)[number]['id']) => {
   isLoading.value = true;
   errorMessage.value = '';
 
   try {
     if (tab === 'tickets') {
-      await loadTickets();
+      const response = await authAPI.getUserTickets();
+      const rawTickets = Array.isArray(response) ? (response as UserTicketResponse[]) : [];
+      ticketEventsForList.value = buildTicketEventListItems(rawTickets);
     } else {
-      await loadFavorites();
+      const response = await authAPI.getFavorites();
+      const rawFavorites = Array.isArray(response) ? (response as Event[]) : [];
+      favoriteEvents.value = rawFavorites;
+      syncFavoriteIdsToSession(rawFavorites);
     }
   } catch (error) {
     errorMessage.value = resolveRequestError(error, 'Не удалось загрузить данные');
