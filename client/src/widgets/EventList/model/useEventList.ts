@@ -10,7 +10,6 @@ import {
 
 interface EventListItem extends Event {
   favorite?: boolean;
-  ticket?: boolean;
 }
 
 interface LoadEventsParams {
@@ -59,8 +58,6 @@ export const useEventList = ({ favoriteIds }: UseEventListOptions = {}) => {
       const eventWithMeta = event as Event & {
         favorite?: boolean;
         isFavorite?: boolean;
-        ticket?: boolean;
-        isTicket?: boolean;
       };
 
       return {
@@ -68,7 +65,6 @@ export const useEventList = ({ favoriteIds }: UseEventListOptions = {}) => {
         favorite:
           localFavoriteIds.value.includes(event.id) ||
           Boolean(eventWithMeta.favorite ?? eventWithMeta.isFavorite),
-        ticket: Boolean(eventWithMeta.ticket ?? eventWithMeta.isTicket),
       };
     }),
   );

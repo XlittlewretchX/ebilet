@@ -1,32 +1,26 @@
 <template>
   <section class="event-card-actions" aria-label="Действия с событием">
-    <template v-if="!props.ticket">
-      <button
-        type="button"
-        :class="[
-          'event-card-actions__button',
-          'event-card-actions__button--favorite',
-          {
-            'event-card-actions__button--favorite-active': props.favorite,
-          },
-        ]"
-        @click="handleFavoriteClick"
-      >
-        {{ favoriteButtonText }}
-      </button>
+    <button
+      type="button"
+      :class="[
+        'event-card-actions__button',
+        'event-card-actions__button--favorite',
+        {
+          'event-card-actions__button--favorite-active': props.favorite,
+        },
+      ]"
+      @click="handleFavoriteClick"
+    >
+      {{ favoriteButtonText }}
+    </button>
 
-      <button
-        type="button"
-        class="event-card-actions__button event-card-actions__button--buy"
-        @click="emit('buy-ticket', props.eventId)"
-      >
-        Купить билет
-      </button>
-    </template>
-
-    <p v-else class="event-card-actions__ticket-status" aria-live="polite">
-      Билет куплен
-    </p>
+    <button
+      type="button"
+      class="event-card-actions__button event-card-actions__button--buy"
+      @click="emit('buy-ticket', props.eventId)"
+    >
+      Купить билет
+    </button>
   </section>
 </template>
 
@@ -37,11 +31,9 @@ const props = withDefaults(
   defineProps<{
     eventId: number;
     favorite?: boolean;
-    ticket?: boolean;
   }>(),
   {
     favorite: false,
-    ticket: false,
   },
 );
 
@@ -117,13 +109,6 @@ const handleFavoriteClick = () => {
         transform: translateY(-2px);
       }
     }
-  }
-
-  &__ticket-status {
-    margin: 0;
-    color: #22c55e;
-    font-size: 1rem;
-    font-weight: 600;
   }
 }
 
