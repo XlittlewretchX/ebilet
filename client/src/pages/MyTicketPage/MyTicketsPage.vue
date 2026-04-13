@@ -46,25 +46,14 @@
         </p>
 
         <section
-          v-else-if="activeTab === 'tickets'"
-          class="my-tickets-page__section"
-          aria-label="Купленные билеты"
-        >
-          <event-list
-            :events="ticketEventsForList"
-            :show-ticket-meta="true"
-            empty-message="У вас пока нет купленных билетов."
-          />
-        </section>
-
-        <section
           v-else
           class="my-tickets-page__section"
-          aria-label="Избранные события"
+          :aria-label="currentTabContent.ariaLabel"
         >
           <event-list
-            :events="favoriteEventsForList"
-            empty-message="У вас пока нет избранных событий."
+            :events="currentTabContent.events"
+            :show-ticket-meta="currentTabContent.showTicketMeta"
+            :empty-message="currentTabContent.emptyMessage"
           />
         </section>
       </section>
@@ -79,19 +68,35 @@ import type { Event } from '@/entities/Event';
 import { useSessionStore } from '@/entities/Session';
 import { authAPI } from '@/shared/api/api';
 import { EventList } from '@/widgets/EventList';
-import { MY_TICKETS_TABS } from './config/constants';
+
+const MY_TICKETS_TABS = [
+  {
+    id: 'tickets',
+    label: 'Мои билеты',
+    emptyMessage: 'У вас пока нет купленных билетов.',
+    ariaLabel: 'Купленные билеты',
+    showTicketMeta: true,
+  },
+  {
+    id: 'favorites',
+    label: 'Избранное',
+    emptyMessage: 'У вас пока нет избранных событий.',
+    ariaLabel: 'Избранные события',
+    showTicketMeta: false,
+  },
+] as const;
 
 interface UserTicketResponse {
   eventId: number;
-  seat?: string | null;
+  seat: string;
   title: string;
-  description?: string;
+  description: string;
   date: string;
   location: string;
   price: number;
   imageUrl?: string;
-  category?: string;
-  userId?: number;
+  category: string;
+  userId: number;
 }
 
 interface MyTicketsEventListItem extends Event {
@@ -103,43 +108,29 @@ interface MyTicketsEventListItem extends Event {
 const buildTicketEventListItems = (
   tickets: UserTicketResponse[],
 ): MyTicketsEventListItem[] => {
-  const groupedItems = new Map<number, MyTicketsEventListItem>();
+  const groupedTickets = Object.groupBy(
+    tickets,
+    (ticket) => String(ticket.eventId),
+  ) as Record<string, UserTicketResponse[]>;
 
-  tickets.forEach((ticket) => {
-    const eventId = Number(ticket.eventId);
+  return Object.keys(groupedTickets).map((eventId) => {
+    const eventTickets = groupedTickets[eventId];
+    const firstTicket = eventTickets[0];
 
-    if (!eventId) {
-      return;
-    }
-
-    const existingItem = groupedItems.get(eventId);
-
-    if (existingItem) {
-      existingItem.ticketCount = (existingItem.ticketCount ?? 0) + 1;
-
-      if (ticket.seat) {
-        existingItem.ticketSeats = [...(existingItem.ticketSeats ?? []), ticket.seat];
-      }
-
-      return;
-    }
-
-    groupedItems.set(eventId, {
-      id: eventId,
-      title: ticket.title,
-      description: ticket.description ?? 'Описание события недоступно',
-      date: ticket.date,
-      location: ticket.location,
-      price: Number(ticket.price) || 0,
-      imageUrl: ticket.imageUrl,
-      category: ticket.category ?? 'other',
-      userId: Number(ticket.userId) || 0,
-      ticketCount: 1,
-      ticketSeats: ticket.seat ? [ticket.seat] : [],
-    });
+    return {
+      id: firstTicket.eventId,
+      title: firstTicket.title,
+      description: firstTicket.description,
+      date: firstTicket.date,
+      location: firstTicket.location,
+      price: firstTicket.price,
+      imageUrl: firstTicket.imageUrl,
+      category: firstTicket.category,
+      userId: firstTicket.userId,
+      ticketCount: eventTickets.length,
+      ticketSeats: eventTickets.map((ticket) => ticket.seat),
+    };
   });
-
-  return Array.from(groupedItems.values());
 };
 
 const buildFavoriteEventListItems = (
@@ -169,7 +160,7 @@ const resolveRequestError = (error: unknown, fallbackMessage: string): string =>
 const sessionStore = useSessionStore();
 const { user } = storeToRefs(sessionStore);
 
-const activeTab = ref<(typeof MY_TICKETS_TABS)[number]['id']>(MY_TICKETS_TABS[0].id);
+const activeTab = ref('tickets');
 const isLoading = ref(false);
 const errorMessage = ref('');
 
@@ -187,20 +178,20 @@ const syncFavoriteIdsToSession = (events: Event[]) => {
   };
 };
 
-const loadTabData = async (tab: (typeof MY_TICKETS_TABS)[number]['id']) => {
+const loadTabData = async (tab: string) => {
   isLoading.value = true;
   errorMessage.value = '';
 
   try {
     if (tab === 'tickets') {
       const response = await authAPI.getUserTickets();
-      const rawTickets = Array.isArray(response) ? (response as UserTicketResponse[]) : [];
-      ticketEventsForList.value = buildTicketEventListItems(rawTickets);
+      ticketEventsForList.value = buildTicketEventListItems(
+        response as UserTicketResponse[],
+      );
     } else {
       const response = await authAPI.getFavorites();
-      const rawFavorites = Array.isArray(response) ? (response as Event[]) : [];
-      favoriteEvents.value = rawFavorites;
-      syncFavoriteIdsToSession(rawFavorites);
+      favoriteEvents.value = response as Event[];
+      syncFavoriteIdsToSession(response as Event[]);
     }
   } catch (error) {
     errorMessage.value = resolveRequestError(error, 'Не удалось загрузить данные');
@@ -229,6 +220,19 @@ const favoriteEventsForList = computed<MyTicketsEventListItem[]>(() => {
   );
 
   return buildFavoriteEventListItems(filteredFavorites);
+});
+
+const currentTabContent = computed(() => {
+  const selectedTab =
+    MY_TICKETS_TABS.find((tab) => tab.id === activeTab.value) ?? MY_TICKETS_TABS[0];
+
+  return {
+    ...selectedTab,
+    events:
+      selectedTab.id === 'tickets'
+        ? ticketEventsForList.value
+        : favoriteEventsForList.value,
+  };
 });
 
 const tabs = computed(() => [
