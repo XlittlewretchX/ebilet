@@ -17,7 +17,7 @@
           <span class="buy-ticket-user-data__label">ФИО</span>
           <input
             id="buy-ticket-user-name"
-            v-model="name"
+            v-model="form.name"
             type="text"
             class="buy-ticket-user-data__input"
             placeholder="Иванов Иван Иванович"
@@ -32,7 +32,7 @@
           <span class="buy-ticket-user-data__label">Телефон</span>
           <input
             id="buy-ticket-user-phone"
-            v-model="phone"
+            v-model="form.phone"
             type="tel"
             class="buy-ticket-user-data__input"
             placeholder="+79991234567"
@@ -46,7 +46,7 @@
           <span class="buy-ticket-user-data__label">Email</span>
           <input
             id="buy-ticket-user-email"
-            v-model="email"
+            v-model="form.email"
             type="email"
             class="buy-ticket-user-data__input"
             placeholder="email@example.com"
@@ -59,14 +59,14 @@
       <footer class="buy-ticket-user-data__actions">
         <button
           type="button"
-          class="buy-ticket-user-data__button buy-ticket-user-data__button--back"
+          class="buy-ticket-user-data__button buy-ticket-user-data__button--back app-button app-button--secondary app-button--wide"
           @click="emit('back')"
         >
           Назад
         </button>
         <button
           type="submit"
-          class="buy-ticket-user-data__button buy-ticket-user-data__button--next"
+          class="buy-ticket-user-data__button buy-ticket-user-data__button--next app-button app-button--primary app-button--wide app-button--push-end"
         >
           К оплате
         </button>
@@ -77,15 +77,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-
-interface TicketUserData {
-  name: string;
-  phone: string;
-  email: string;
-}
+import type { TicketUserData } from '@/pages/BuyTicketPage/model/types';
 
 const props = defineProps<{
-  initialEmail: string;
   initialData: TicketUserData | null;
 }>();
 
@@ -94,39 +88,28 @@ const emit = defineEmits<{
   (event: 'back'): void;
 }>();
 
-const name = ref('');
-const phone = ref('');
-const email = ref(props.initialEmail);
+const form = ref<TicketUserData>({
+  name: '',
+  phone: '',
+  email: '',
+});
 
 watch(
   () => props.initialData,
   (nextData) => {
-    if (nextData) {
-      name.value = nextData.name;
-      phone.value = nextData.phone;
-      email.value = nextData.email;
-      return;
-    }
-
-    name.value = '';
-    phone.value = '';
-    email.value = props.initialEmail;
+    form.value = nextData
+      ? { ...nextData }
+      : {
+          name: '',
+          phone: '',
+          email: '',
+        };
   },
   { immediate: true },
 );
 
-watch(() => props.initialEmail, (nextEmail) => {
-  if (!props.initialData) {
-    email.value = nextEmail;
-  }
-});
-
 const handleSubmit = () => {
-  emit('submit', {
-    name: name.value,
-    phone: phone.value,
-    email: email.value,
-  });
+  emit('submit', { ...form.value });
 };
 </script>
 
@@ -217,30 +200,6 @@ const handleSubmit = () => {
     gap: 0.6rem;
   }
 
-  &__button {
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-
-    &--back {
-      background: #d7dee9;
-      color: #0f172a;
-    }
-
-    &--next {
-      margin-left: auto;
-      background: #2563eb;
-      color: #ffffff;
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-    }
-  }
 }
 
 @media (max-width: 560px) {

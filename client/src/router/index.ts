@@ -43,9 +43,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/buy/:eventId',
+      path: '/buy/:eventId(\\d+)',
       name: RouteName.BuyTicket,
       component: BuyTicketPage,
+      props: (route) => ({
+        eventId: Number(route.params.eventId),
+      }),
       meta: { requiresAuth: true },
     },
   ],

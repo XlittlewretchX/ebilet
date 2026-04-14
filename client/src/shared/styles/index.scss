@@ -23,6 +23,55 @@ button {
   font-family: inherit;
 }
 
+.app-button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.app-button:hover {
+  transform: translateY(-1px);
+}
+
+.app-button--primary {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.24);
+}
+
+.app-button--primary:hover {
+  background: #1d4ed8;
+}
+
+.app-button--secondary {
+  background: #d7dee9;
+  color: #0f172a;
+}
+
+.app-button--secondary:hover {
+  background: #c6d0dd;
+}
+
+.app-button--wide {
+  padding: 0.75rem 1rem;
+}
+
+.app-button--push-end {
+  margin-left: auto;
+}
+
+.app-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 input,
 textarea,
 select {

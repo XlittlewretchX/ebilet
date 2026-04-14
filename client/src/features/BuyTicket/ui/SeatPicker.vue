@@ -2,26 +2,20 @@
   <section class="buy-ticket-picker" aria-labelledby="buy-ticket-picker-title">
     <header class="buy-ticket-picker__header">
       <h2 id="buy-ticket-picker-title" class="buy-ticket-picker__title">
-        {{ isSeatMode ? 'Выбор мест' : 'Количество билетов' }}
+        {{ pickerTitle }}
       </h2>
-      <p class="buy-ticket-picker__subtitle">
-        {{
-          isSeatMode
-            ? 'Отметьте свободные места на схеме зала.'
-            : 'Укажите количество билетов для покупки.'
-        }}
-      </p>
+      <p class="buy-ticket-picker__subtitle">{{ pickerSubtitle }}</p>
     </header>
 
     <p
-      v-if="isSeatMode && isLoading"
+      v-if="props.seatingType !== 'none' && isLoading"
       class="buy-ticket-picker__state buy-ticket-picker__state--loading"
     >
       Загружаем схему зала...
     </p>
 
     <p
-      v-else-if="isSeatMode && errorMessage"
+      v-else-if="props.seatingType !== 'none' && errorMessage"
       class="buy-ticket-picker__state buy-ticket-picker__state--error"
       role="alert"
     >
@@ -29,14 +23,14 @@
     </p>
 
     <section v-else class="buy-ticket-picker__content">
-      <section v-if="!isSeatMode" class="buy-ticket-picker__count" aria-label="Выбор количества">
+      <section v-if="props.seatingType === 'none'" class="buy-ticket-picker__count" aria-label="Выбор количества">
         <div class="buy-ticket-picker__count-controls">
           <button
             type="button"
             class="buy-ticket-picker__count-button"
             :disabled="count <= 1"
             aria-label="Уменьшить количество билетов"
-            @click="count > 1 && (count -= 1)"
+            @click="decreaseCount"
           >
             −
           </button>
@@ -56,7 +50,7 @@
             class="buy-ticket-picker__count-button"
             :disabled="count >= MAX_COUNT"
             aria-label="Увеличить количество билетов"
-            @click="count < MAX_COUNT && (count += 1)"
+            @click="increaseCount"
           >
             +
           </button>
@@ -100,11 +94,13 @@
                 v-for="seat in row.seats"
                 :key="seat"
                 type="button"
-                class="buy-ticket-picker__grid-seat"
-                :class="{
-                  'buy-ticket-picker__grid-seat--selected': isSelectedSeat(seat),
-                  'buy-ticket-picker__grid-seat--booked': isBookedSeat(seat),
-                }"
+                :class="[
+                  'buy-ticket-picker__grid-seat',
+                  {
+                    'buy-ticket-picker__grid-seat--selected': isSelectedSeat(seat),
+                    'buy-ticket-picker__grid-seat--booked': isBookedSeat(seat),
+                  },
+                ]"
                 :disabled="isBookedSeat(seat)"
                 :aria-label="resolveSeatAriaLabel(seat)"
                 :aria-pressed="isSelectedSeat(seat)"
@@ -127,8 +123,8 @@
       <footer class="buy-ticket-picker__footer">
         <button
           type="button"
-          class="buy-ticket-picker__next-button"
-          :disabled="isSeatMode ? selectedSeats.length === 0 : count < 1"
+          class="buy-ticket-picker__next-button app-button app-button--primary app-button--wide"
+          :disabled="isEmptySelection"
           @click="handleSubmit"
         >
           Продолжить
@@ -141,11 +137,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { eventAPI } from '@/shared/api/api';
-
-interface SeatSelection {
-  count: number;
-  seats: string[] | null;
-}
+import type { SeatSelection } from '@/pages/BuyTicketPage/model/types';
 
 const MAX_COUNT = 10;
 const MAX_SELECT = 10;
@@ -161,28 +153,47 @@ const emit = defineEmits<{
   (event: 'submit', payload: SeatSelection): void;
 }>();
 
-const isSeatMode = computed(() => props.seatingType !== 'none');
+const pickerTitle = computed(() =>
+  props.seatingType !== 'none' ? 'Выбор мест' : 'Количество билетов',
+);
+const pickerSubtitle = computed(() =>
+  props.seatingType !== 'none'
+    ? 'Отметьте свободные места на схеме зала.'
+    : 'Укажите количество билетов для покупки.',
+);
 
 const count = ref(props.initialCount);
 const bookedSeats = ref<string[]>([]);
 const selectedSeats = ref<string[]>([]);
 const isLoading = ref(true);
 const errorMessage = ref('');
+const isEmptySelection = computed(() =>
+  (props.seatingType !== 'none' && selectedSeats.value.length === 0) ||
+  (props.seatingType === 'none' && count.value < 1),
+);
+
+const resetSeatState = () => {
+  bookedSeats.value = [];
+  selectedSeats.value = [];
+  errorMessage.value = '';
+  isLoading.value = false;
+};
+
+const decreaseCount = () => {
+  if (count.value > 1) {
+    count.value -= 1;
+  }
+};
+
+const increaseCount = () => {
+  if (count.value < MAX_COUNT) {
+    count.value += 1;
+  }
+};
 
 const loadBookedSeats = async () => {
-  if (!isSeatMode.value) {
-    bookedSeats.value = [];
-    selectedSeats.value = [];
-    errorMessage.value = '';
-    isLoading.value = false;
-    return;
-  }
-
-  if (!Number.isFinite(props.eventId) || props.eventId <= 0) {
-    bookedSeats.value = [];
-    selectedSeats.value = [];
-    errorMessage.value = 'Некорректный идентификатор события';
-    isLoading.value = false;
+  if (props.seatingType === 'none') {
+    resetSeatState();
     return;
   }
 
@@ -234,7 +245,7 @@ watch(
 );
 
 watch(
-  [() => props.eventId, isSeatMode],
+  [() => props.eventId, () => props.seatingType],
   () => {
     void loadBookedSeats();
   },
@@ -256,30 +267,24 @@ const isBookedSeat = (seat: string) => bookedSeats.value.includes(seat);
 const isSelectedSeat = (seat: string) => selectedSeats.value.includes(seat);
 
 const resolveSeatAriaLabel = (seat: string) => {
-  if (isBookedSeat(seat)) {
-    return `Место ${seat}, занято`;
-  }
-
-  if (isSelectedSeat(seat)) {
-    return `Место ${seat}, выбрано`;
-  }
-
-  return `Место ${seat}, свободно`;
+  const seatState = isBookedSeat(seat)
+    ? 'занято'
+    : (isSelectedSeat(seat) && 'выбрано') || 'свободно';
+  return `Место ${seat}, ${seatState}`;
 };
 
 const handleSubmit = () => {
-  emit(
-    'submit',
-    isSeatMode.value
-      ? {
-          count: selectedSeats.value.length,
-          seats: [...selectedSeats.value],
-        }
-      : {
-          count: count.value,
-          seats: null,
-        },
-  );
+  const payload: SeatSelection = {
+    count: count.value,
+    seats: null,
+  };
+
+  if (props.seatingType !== 'none') {
+    payload.count = selectedSeats.value.length;
+    payload.seats = [...selectedSeats.value];
+  }
+
+  emit('submit', payload);
 };
 </script>
 
@@ -492,21 +497,6 @@ const handleSubmit = () => {
     justify-content: flex-end;
   }
 
-  &__next-button {
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    background: #2563eb;
-    color: #ffffff;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
 }
 
 @media (max-width: 560px) {

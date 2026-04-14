@@ -5,7 +5,7 @@
         <h1 id="buy-ticket-page-title" class="buy-ticket-page__title">
           Покупка билетов
         </h1>
-        <p v-if="eventTitle" class="buy-ticket-page__subtitle">{{ eventTitle }}</p>
+        <p v-if="event?.title" class="buy-ticket-page__subtitle">{{ event?.title }}</p>
       </header>
 
       <p v-if="isEventLoading" class="buy-ticket-page__state buy-ticket-page__state--loading">
@@ -25,11 +25,13 @@
           <li
             v-for="(label, index) in progressLabels"
             :key="label"
-            class="buy-ticket-page__progress-item"
-            :class="{
-              'buy-ticket-page__progress-item--active': index === currentStepIndex,
-              'buy-ticket-page__progress-item--done': currentStepIndex > index,
-            }"
+            :class="[
+              'buy-ticket-page__progress-item',
+              {
+                'buy-ticket-page__progress-item--active': index === currentStepIndex,
+                'buy-ticket-page__progress-item--done': currentStepIndex > index,
+              },
+            ]"
           >
             {{ label }}
           </li>
@@ -46,7 +48,7 @@
         <seat-picker
           v-if="currentStep === 'picker'"
           :event-id="eventId"
-          :seating-type="eventSeatingType"
+          :seating-type="event?.seatingType || 'none'"
           :initial-count="purchaseForm.count"
           :initial-seats="purchaseForm.seat"
           @submit="submitSelection"
@@ -54,7 +56,6 @@
 
         <user-data-form
           v-else-if="currentStep === 'user-data'"
-          :initial-email="initialEmail"
           :initial-data="purchaseForm.userData"
           @submit="submitUserData"
           @back="goToStep('picker')"
@@ -62,7 +63,7 @@
 
         <payment-form
           v-else-if="currentStep === 'payment'"
-          :event-title="eventTitle"
+          :event-title="event?.title || ''"
           :amount="paymentAmount"
           :loading="isSubmitting"
           @submit="submitPayment"
@@ -71,7 +72,7 @@
 
         <success-step
           v-else
-          :event-title="eventTitle"
+          :event-title="event?.title || ''"
           :places="selectedPlaces"
           :count="ticketCount"
           @go-to-tickets="router.push({ name: RouteName.MyTickets })"
@@ -83,22 +84,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, ref, toRef, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useSessionStore } from '@/entities/Session';
 import SeatPicker from '@/features/BuyTicket/ui/SeatPicker.vue';
 import UserDataForm from '@/features/BuyTicket/ui/UserDataForm.vue';
 import PaymentForm from '@/features/BuyTicket/ui/PaymentForm.vue';
 import SuccessStep from '@/features/BuyTicket/ui/SuccessStep.vue';
 import { useBuyTicketPage } from '@/pages/BuyTicketPage/model/useBuyTicketPage';
+import type {
+  BuyTicketStep,
+  SeatSelection,
+  TicketUserData,
+} from '@/pages/BuyTicketPage/model/types';
 import { RouteName } from '@/shared/config/routeNames';
 
-const route = useRoute();
+const props = defineProps<{
+  eventId: number;
+}>();
+const eventId = toRef(props, 'eventId');
+
 const router = useRouter();
 const sessionStore = useSessionStore();
-
-const eventId = computed(() => Number(route.params.eventId));
-const initialEmail = computed(() => sessionStore.user?.email ?? '');
+const stepOrder: BuyTicketStep[] = ['picker', 'user-data', 'payment', 'success'];
 
 const {
   event,
@@ -109,12 +117,10 @@ const {
   submitPayment: requestPayment,
 } = useBuyTicketPage(eventId);
 
-type Step = 'picker' | 'user-data' | 'payment' | 'success';
-
-const currentStep = ref<Step>('picker');
+const currentStep = ref<BuyTicketStep>('picker');
 const feedbackMessage = ref('');
 
-const goToStep = (step: Step) => {
+const goToStep = (step: BuyTicketStep) => {
   feedbackMessage.value = '';
   currentStep.value = step;
 };
@@ -123,13 +129,22 @@ watch(eventId, () => {
   goToStep('picker');
 });
 
-const submitSelection = (selection: { count: number; seats: string[] | null }) => {
-  purchaseForm.value.count = Math.max(1, selection.count);
+const submitSelection = (selection: SeatSelection) => {
+  purchaseForm.value.count = selection.count;
   purchaseForm.value.seat = selection.seats ? [...selection.seats] : null;
+
+  if (!purchaseForm.value.userData) {
+    purchaseForm.value.userData = {
+      name: '',
+      phone: '',
+      email: sessionStore.user?.email ?? '',
+    };
+  }
+
   goToStep('user-data');
 };
 
-const submitUserData = (userData: { name: string; phone: string; email: string }) => {
+const submitUserData = (userData: TicketUserData) => {
   purchaseForm.value.userData = userData;
   goToStep('payment');
 };
@@ -145,33 +160,32 @@ const submitPayment = async () => {
   goToStep('success');
 };
 
-const eventTitle = computed(() => event.value?.title ?? '');
-const eventSeatingType = computed(() => event.value?.seatingType ?? 'none');
 const ticketCount = computed(() => {
-  if (!event.value) {
+  const currentEvent = event.value;
+
+  if (!currentEvent) {
     return 1;
   }
 
-  if (event.value.seatingType === 'none') {
+  if ((currentEvent.seatingType || 'none') === 'none') {
     return purchaseForm.value.count;
   }
 
-  return purchaseForm.value.seat?.length ? purchaseForm.value.seat.length : 1;
+  return purchaseForm.value.seat?.length || 1;
 });
-const paymentAmount = computed(() =>
-  event.value ? event.value.price * ticketCount.value : 0,
-);
+const paymentAmount = computed(() => (event.value?.price || 0) * ticketCount.value);
 const selectedPlaces = computed(() => {
-  if (!event.value || event.value.seatingType === 'none') {
+  const currentEvent = event.value;
+
+  if (!currentEvent || (currentEvent.seatingType || 'none') === 'none') {
     return undefined;
   }
 
-  return purchaseForm.value.seat ?? undefined;
+  return purchaseForm.value.seat;
 });
-const stepOrder = ['picker', 'user-data', 'payment', 'success'] as const;
 const currentStepIndex = computed(() => stepOrder.indexOf(currentStep.value));
 const progressLabels = computed(() => [
-  eventSeatingType.value === 'none' ? 'Количество' : 'Места',
+  (event.value?.seatingType || 'none') === 'none' ? 'Количество' : 'Места',
   'Данные',
   'Оплата',
   'Готово',
@@ -185,7 +199,7 @@ const progressLabels = computed(() => [
 
   &__container {
     width: 100%;
-    max-width: 980px;
+    max-width: 61.25rem;
     margin: 0 auto;
   }
 

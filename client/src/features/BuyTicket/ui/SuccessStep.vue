@@ -25,7 +25,7 @@
     <nav class="buy-ticket-success-step__actions" aria-label="Дальнейшие действия">
       <button
         type="button"
-        class="buy-ticket-success-step__button buy-ticket-success-step__button--primary"
+        class="buy-ticket-success-step__button app-button app-button--primary"
         @click="emit('go-to-tickets')"
       >
         Мои билеты
@@ -33,7 +33,7 @@
 
       <button
         type="button"
-        class="buy-ticket-success-step__button buy-ticket-success-step__button--secondary"
+        class="buy-ticket-success-step__button app-button app-button--secondary"
         @click="emit('go-home')"
       >
         На главную
@@ -122,42 +122,7 @@ const emit = defineEmits<{
     gap: 0.6rem;
   }
 
-  &__button {
-    flex: 1;
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease,
-      background-color 0.2s ease;
 
-    &:hover {
-      transform: translateY(-1px);
-    }
-
-    &--primary {
-      background: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.24);
-
-      &:hover {
-        background: #1d4ed8;
-      }
-    }
-
-    &--secondary {
-      background: #d7dee9;
-      color: #0f172a;
-
-      &:hover {
-        background: #c6d0dd;
-      }
-    }
-  }
 
   &__thanks {
     margin: 0;

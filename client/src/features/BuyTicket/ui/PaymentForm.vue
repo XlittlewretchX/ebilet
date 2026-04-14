@@ -1,8 +1,5 @@
 <template>
-  <section
-    class="buy-ticket-payment"
-    aria-labelledby="buy-ticket-payment-title"
-  >
+  <section class="buy-ticket-payment" aria-labelledby="buy-ticket-payment-title">
     <header class="buy-ticket-payment__header">
       <h2 id="buy-ticket-payment-title" class="buy-ticket-payment__title">
         Оплата
@@ -35,10 +32,10 @@
             type="text"
             inputmode="numeric"
             autocomplete="cc-number"
-            class="buy-ticket-payment__input"
-            :class="{
-              'buy-ticket-payment__input--error': isFieldError('card'),
-            }"
+            :class="[
+              'buy-ticket-payment__input',
+              { 'buy-ticket-payment__input--error': isFieldError('card') },
+            ]"
             placeholder="0000 0000 0000 0000"
             maxlength="19"
             @input="handleInput('card', $event)"
@@ -59,10 +56,10 @@
               type="text"
               inputmode="numeric"
               autocomplete="cc-exp"
-              class="buy-ticket-payment__input"
-              :class="{
-                'buy-ticket-payment__input--error': isFieldError('date'),
-              }"
+              :class="[
+                'buy-ticket-payment__input',
+                { 'buy-ticket-payment__input--error': isFieldError('date') },
+              ]"
               placeholder="MM/YY"
               maxlength="5"
               @input="handleInput('date', $event)"
@@ -82,10 +79,10 @@
               type="password"
               inputmode="numeric"
               autocomplete="cc-csc"
-              class="buy-ticket-payment__input"
-              :class="{
-                'buy-ticket-payment__input--error': isFieldError('cvv'),
-              }"
+              :class="[
+                'buy-ticket-payment__input',
+                { 'buy-ticket-payment__input--error': isFieldError('cvv') },
+              ]"
               placeholder="123"
               maxlength="3"
               @input="handleInput('cvv', $event)"
@@ -105,14 +102,14 @@
       <footer class="buy-ticket-payment__actions">
         <button
           type="button"
-          class="buy-ticket-payment__button buy-ticket-payment__button--back"
+          class="buy-ticket-payment__button buy-ticket-payment__button--back app-button app-button--secondary app-button--wide"
           @click="emit('back')"
         >
           Назад
         </button>
         <button
           type="submit"
-          class="buy-ticket-payment__button buy-ticket-payment__button--submit"
+          class="buy-ticket-payment__button buy-ticket-payment__button--submit app-button app-button--primary app-button--wide app-button--push-end"
           :disabled="!isValid || props.loading"
         >
           {{ props.loading ? 'Оплата...' : 'Оплатить' }}
@@ -136,11 +133,7 @@ const emit = defineEmits<{
   (event: 'back'): void;
 }>();
 
-const form = ref<{
-  card: string;
-  date: string;
-  cvv: string;
-}>({
+const form = ref({
   card: '',
   date: '',
   cvv: '',
@@ -149,11 +142,7 @@ const form = ref<{
 const dateInputRef = ref<HTMLInputElement | null>(null);
 const cvvInputRef = ref<HTMLInputElement | null>(null);
 
-const touched = ref<{
-  card: boolean;
-  date: boolean;
-  cvv: boolean;
-}>({
+const touched = ref({
   card: false,
   date: false,
   cvv: false,
@@ -213,12 +202,19 @@ const isFieldError = (field: 'card' | 'date' | 'cvv') =>
 const handleInput = (field: 'card' | 'date' | 'cvv', event: Event) => {
   const target = event.target as HTMLInputElement;
   const rawValue = target.value;
-  const nextValue =
-    field === 'card'
-      ? formatCardNumber(rawValue)
-      : field === 'date'
-        ? formatExpiryDate(rawValue)
-        : rawValue.replace(/\D/g, '').slice(0, 3);
+  let nextValue = rawValue;
+
+  switch (field) {
+    case 'card':
+      nextValue = formatCardNumber(rawValue);
+      break;
+    case 'date':
+      nextValue = formatExpiryDate(rawValue);
+      break;
+    case 'cvv':
+      nextValue = rawValue.replace(/\D/g, '').slice(0, 3);
+      break;
+  }
 
   form.value[field] = nextValue;
 
@@ -359,30 +355,6 @@ const handleSubmit = () => {
     gap: 0.6rem;
   }
 
-  &__button {
-    border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-
-    &--back {
-      background: #d7dee9;
-      color: #0f172a;
-    }
-
-    &--submit {
-      margin-left: auto;
-      background: #2563eb;
-      color: #ffffff;
-
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-    }
-  }
 }
 
 @media (max-width: 560px) {

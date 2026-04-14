@@ -1,19 +1,20 @@
 import { ref, watch, type Ref } from 'vue';
 import type { Event } from '@/entities/Event';
 import { authAPI, eventAPI } from '@/shared/api/api';
+import type { PurchaseFormState, SeatingType } from './types';
 
-export const useBuyTicketPage = (eventId: Ref<number>) => {
-  const event = ref<(Event & { seatingType: 'none' | 'grid' | 'circle' }) | null>(
-    null,
-  );
+export const useBuyTicketPage = (
+  eventId: Ref<number>,
+) => {
+  const event = ref<(Event & { seatingType?: SeatingType }) | null>(null);
   const isEventLoading = ref(true);
   const eventError = ref('');
   const isSubmitting = ref(false);
 
-  const purchaseForm = ref({
+  const purchaseForm = ref<PurchaseFormState>({
     count: 1,
-    seat: null as string[] | null,
-    userData: null as { name: string; phone: string; email: string } | null,
+    seat: null,
+    userData: null,
   });
 
   const loadEvent = async () => {
@@ -24,12 +25,6 @@ export const useBuyTicketPage = (eventId: Ref<number>) => {
     isEventLoading.value = true;
     eventError.value = '';
     event.value = null;
-
-    if (!Number.isFinite(eventId.value) || eventId.value <= 0) {
-      eventError.value = 'Некорректный идентификатор события.';
-      isEventLoading.value = false;
-      return;
-    }
 
     try {
       event.value = await eventAPI.getById(eventId.value);
@@ -61,23 +56,13 @@ export const useBuyTicketPage = (eventId: Ref<number>) => {
     isSubmitting.value = true;
 
     try {
-      let seatPayload: string | string[] | null = purchaseForm.value.seat;
-
-      if (event.value.seatingType === 'none') {
-        seatPayload = Array.from(
-          { length: purchaseForm.value.count },
-          () => null,
-        ) as unknown as string[];
-      }
-
-      const normalizedSeatPayload =
-        Array.isArray(seatPayload) && seatPayload.length === 1
-          ? seatPayload[0]
-          : seatPayload;
+      const seatingType = event.value.seatingType || 'none';
+      const seatPayload: string[] | null =
+        seatingType === 'none' ? null : (purchaseForm.value.seat ?? null);
 
       await authAPI.buyTicket({
         eventId: eventId.value,
-        seat: normalizedSeatPayload,
+        seat: seatPayload,
         ...purchaseForm.value.userData,
       });
 
