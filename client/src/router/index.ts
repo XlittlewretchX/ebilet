@@ -3,7 +3,7 @@ import HomePage from '@/pages/HomePage';
 import AuthPage from '@/pages/AuthPage';
 import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage.vue';
-import BuyTicketPage from '@/pages/BuyTicketPage/BuyTicketPage.vue';
+import BuyTicketPage from '@/pages/BuyTicketPage/ui/BuyTicketPage.vue';
 import { useSessionStore } from '@/entities/Session';
 import { RouteName } from '@/shared/config/routeNames';
 
@@ -43,9 +43,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/buy/:eventId',
+      path: '/buy/:eventId(\\d+)',
       name: RouteName.BuyTicket,
       component: BuyTicketPage,
+      props: (route) => ({
+        eventId: Number(route.params.eventId),
+      }),
       meta: { requiresAuth: true },
     },
   ],

@@ -167,7 +167,7 @@ const handleBuyTicket = (eventId: number) => {
   void router.push({
     name: RouteName.BuyTicket,
     params: {
-      eventId: String(eventId),
+      eventId,
     },
   });
 };

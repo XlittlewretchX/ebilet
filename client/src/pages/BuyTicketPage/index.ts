@@ -1,1 +1,1 @@
-export { default } from './BuyTicketPage'; 
+export { default } from './BuyTicketPage';
