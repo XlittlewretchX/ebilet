@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '@/pages/HomePage';
 import AuthPage from '@/pages/AuthPage';
-import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue';
+import ProfilePage from '@/pages/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage.vue';
 import BuyTicketPage from '@/pages/BuyTicketPage/ui/BuyTicketPage.vue';
 import { useSessionStore } from '@/entities/Session';

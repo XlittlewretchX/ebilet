@@ -6,7 +6,7 @@ import Header from '@/widgets/Header/Header';
 import HomePage from '@/pages/HomePage/ui/HomePage';
 import ProfilePage from '@/pages/ProfilePage/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage';
-import BuyTicketPage from '@/pages/BuyTicketPage';
+import BuyTicketPage from '@/pages/BuyTicketPage/BuyTicketPage';
 import ProtectedRoute from '@/shared/ui/ProtectedRoute';
 import styles from './app/styles/App.module.scss';
 import { checkAuth } from '@/features/AuthModal/model/authSlice';

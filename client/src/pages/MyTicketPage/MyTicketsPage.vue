@@ -64,6 +64,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 import type { Event } from '@/entities/Event';
 import { useSessionStore } from '@/entities/Session';
 import { authAPI } from '@/shared/api/api';
@@ -105,6 +106,7 @@ interface MyTicketsEventListItem extends Event {
   ticketSeats?: string[];
 }
 
+const route = useRoute();
 const buildTicketEventListItems = (
   tickets: UserTicketResponse[],
 ): MyTicketsEventListItem[] => {
@@ -160,7 +162,13 @@ const resolveRequestError = (error: unknown, fallbackMessage: string): string =>
 const sessionStore = useSessionStore();
 const { user } = storeToRefs(sessionStore);
 
-const activeTab = ref('tickets');
+const resolveTabId = (queryTab: unknown): (typeof MY_TICKETS_TABS)[number]['id'] => (
+  queryTab === 'favorites' ? 'favorites' : 'tickets'
+);
+
+const activeTab = ref<(typeof MY_TICKETS_TABS)[number]['id']>(
+  resolveTabId(route.query.tab),
+);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
@@ -199,6 +207,17 @@ const loadTabData = async (tab: string) => {
     isLoading.value = false;
   }
 };
+
+watch(
+  () => route.query.tab,
+  (queryTab) => {
+    const nextTab = resolveTabId(queryTab);
+
+    if (nextTab !== activeTab.value) {
+      activeTab.value = nextTab;
+    }
+  },
+);
 
 watch(
   activeTab,

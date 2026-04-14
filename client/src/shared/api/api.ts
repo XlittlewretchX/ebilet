@@ -45,7 +45,7 @@ export const authAPI = {
     return response.data;
   },
 
-  uploadAvatar: async (file: File) => {
+  uploadAvatar: async (file: File): Promise<{ avatarUrl: string }> => {
     const formData = new FormData();
     formData.append('avatar', file);
     const response = await api.post('/auth/avatar', formData, {
@@ -56,7 +56,7 @@ export const authAPI = {
     return response.data;
   },
 
-  resetAvatar: async () => {
+  resetAvatar: async (): Promise<{ avatarUrl: null }> => {
     const response = await api.delete('/auth/avatar');
     return response.data;
   },
@@ -96,7 +96,7 @@ export const authAPI = {
     return response.data;
   },
 
-  updateUsername: async (username: string) => {
+  updateUsername: async (username: string): Promise<{ username: string }> => {
     const response = await api.patch('/auth/username', { username });
     return response.data;
   },
