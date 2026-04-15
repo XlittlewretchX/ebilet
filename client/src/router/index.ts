@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '@/pages/HomePage';
 import AuthPage from '@/pages/AuthPage';
-import ProfilePage from '@/pages/ProfilePage/ProfilePage.vue';
+import ProfilePage from '@/pages/ProfilePage';
 import MyTicketsPage from '@/pages/MyTicketPage/MyTicketsPage.vue';
 import BuyTicketPage from '@/pages/BuyTicketPage/ui/BuyTicketPage.vue';
 import { useSessionStore } from '@/entities/Session';
@@ -10,11 +10,14 @@ import { RouteName } from '@/shared/config/routeNames';
 const base = process.env.NODE_ENV === 'production' ? '/ebilet/' : '/';
 
 const resolveRedirectName = (routeName: string | symbol | null | undefined): RouteName => {
-  if (routeName === RouteName.BuyTicket || routeName === RouteName.Profile) {
-    return routeName;
+  switch (routeName) {
+    case RouteName.BuyTicket:
+    case RouteName.Profile:
+    case RouteName.MyFavorites:
+      return routeName;
+    default:
+      return RouteName.MyTickets;
   }
-
-  return RouteName.MyTickets;
 };
 
 const router = createRouter({
@@ -39,6 +42,12 @@ const router = createRouter({
     {
       path: '/my-tickets',
       name: RouteName.MyTickets,
+      component: MyTicketsPage,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/my-favorites',
+      name: RouteName.MyFavorites,
       component: MyTicketsPage,
       meta: { requiresAuth: true },
     },

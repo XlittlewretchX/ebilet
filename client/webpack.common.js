@@ -7,7 +7,7 @@ const { VueLoaderPlugin } = require('vue-loader');
 module.exports = {
   entry: './src/main.ts',
   resolve: {
-    extensions: ['.vue', '.tsx', '.ts', '.js'],
+    extensions: ['.vue', '.ts', '.js'],
     alias: { '@': path.resolve(__dirname, 'src') },
   },
   module: {
@@ -17,7 +17,7 @@ module.exports = {
         loader: 'vue-loader',
       },
       {
-        test: /\.tsx?$/i,
+        test: /\.ts$/i,
         use: {
           loader: 'ts-loader',
           options: {

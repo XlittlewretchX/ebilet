@@ -42,7 +42,9 @@ const initialMode = computed(() =>
 
 const redirectName = computed<RouteName>(() => {
   const queryName = route.query['redirect-name'];
-  return queryName === RouteName.BuyTicket || queryName === RouteName.Profile
+  return queryName === RouteName.BuyTicket
+    || queryName === RouteName.Profile
+    || queryName === RouteName.MyFavorites
     ? queryName
     : RouteName.MyTickets;
 });
