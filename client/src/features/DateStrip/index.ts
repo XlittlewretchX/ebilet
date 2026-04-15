@@ -1,1 +1,1 @@
-export { default } from './ui/DateStrip'; 
+export { default } from './ui/DateStrip.vue';

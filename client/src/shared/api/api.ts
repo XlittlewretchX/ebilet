@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { User, Event } from '../types';
-import type { FilterState } from '@/features/Filters/filterSlice';
+import type { FilterState } from '@/features/FilterPanel/model/types';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -11,6 +11,21 @@ const api = axios.create({
   },
 });
 
+export interface LoginPayload {
+  username: string;
+  password: string;
+}
+
+export interface RegisterPayload extends LoginPayload {
+  email: string;
+  city: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -20,22 +35,17 @@ api.interceptors.request.use((config) => {
 });
 
 export const authAPI = {
-  register: async (userData: {
-    username: string;
-    email: string;
-    password: string;
-    city: string;
-  }) => {
+  register: async (userData: RegisterPayload): Promise<AuthResponse> => {
     const response = await api.post('/auth/register', userData);
     return response.data;
   },
 
-  login: async (credentials: { username: string; password: string }) => {
+  login: async (credentials: LoginPayload): Promise<AuthResponse> => {
     const response = await api.post('/auth/login', credentials);
     return response.data;
   },
 
-  uploadAvatar: async (file: File) => {
+  uploadAvatar: async (file: File): Promise<{ avatarUrl: string }> => {
     const formData = new FormData();
     formData.append('avatar', file);
     const response = await api.post('/auth/avatar', formData, {
@@ -46,7 +56,7 @@ export const authAPI = {
     return response.data;
   },
 
-  resetAvatar: async () => {
+  resetAvatar: async (): Promise<{ avatarUrl: null }> => {
     const response = await api.delete('/auth/avatar');
     return response.data;
   },
@@ -81,19 +91,21 @@ export const authAPI = {
     return response.data;
   },
 
-  checkAuth: async () => {
+  checkAuth: async (): Promise<AuthResponse> => {
     const response = await api.get('/auth/check');
     return response.data;
   },
 
-  updateUsername: async (username: string) => {
+  updateUsername: async (username: string): Promise<{ username: string }> => {
     const response = await api.patch('/auth/username', { username });
     return response.data;
   },
 };
 
 export const eventAPI = {
-  getAll: async (filters: Partial<FilterState> & { search?: string; city?: string } = {}) => {
+  getAll: async <T = Event[]>(
+    filters: Partial<FilterState> & { search?: string; city?: string } = {},
+  ): Promise<T> => {
     const params = new URLSearchParams();
     if (filters.category) params.append('category', filters.category);
     if (filters.subcategory) params.append('subcategory', filters.subcategory);
@@ -105,7 +117,7 @@ export const eventAPI = {
     if (filters.city) params.append('city', filters.city);
     // Можно добавить другие фильтры по необходимости
     const response = await api.get('/events', { params });
-    return response.data;
+    return response.data as T;
   },
 
   getById: async (id: number) => {

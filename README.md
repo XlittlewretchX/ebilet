@@ -1,6 +1,6 @@
 # eBilet - Сервис бронирования билетов
 
-EBilet - это современный веб-сервис для бронирования билетов на различные мероприятия. Проект разработан с использованием React, TypeScript, Redux Toolkit на фронтенде и Node.js, Express, SQLite на бэкенде.
+EBilet - это современный веб-сервис для бронирования билетов на различные мероприятия. Проект разработан с использованием Vue 3, TypeScript, Pinia на фронтенде и Node.js, Express, SQLite на бэкенде.
 
 ## О проекте
 
@@ -45,11 +45,13 @@ eBilet предоставляет удобную платформу для ор�
 ## Технологии
 
 ### Фронтенд
-- React 19
+- Vue 3
 - TypeScript
-- Redux Toolkit
-- React Router
-- SCSS Modules
+- Pinia
+- Vue Router
+- Sass (SCSS)
+- Axios
+- ESLint
 - Webpack
 
 ### Backend
@@ -107,9 +109,9 @@ npm run dev
 ebilet/
 ├── client/                 # Frontend часть
 │   ├── src/
-│   │   ├── components/    # React компоненты
+│   │   ├── components/    # Vue компоненты
 │   │   ├── pages/        # Страницы приложения
-│   │   ├── store/        # Redux store и slices
+│   │   ├── entities/     # Доменные сущности и state (Pinia)
 │   │   ├── services/     # API сервисы
 │   │   └── types/        # TypeScript типы   
 │
