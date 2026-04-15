@@ -22,7 +22,7 @@
             },
           ]"
           :aria-pressed="activeTab === tab.id"
-          @click="activeTab = tab.id"
+          @click="setActiveTab(tab.id)"
         >
           {{ tab.label }}
           <span class="my-tickets-page__tab-count">{{ tab.count }}</span>
@@ -64,13 +64,22 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { Event } from '@/entities/Event';
 import { useSessionStore } from '@/entities/Session';
 import { authAPI } from '@/shared/api/api';
+import { RouteName } from '@/shared/config/routeNames';
 import { EventList } from '@/widgets/EventList';
 
-const MY_TICKETS_TABS = [
+type MyTicketsTabId = 'tickets' | 'favorites';
+
+const MY_TICKETS_TABS: ReadonlyArray<{
+  id: MyTicketsTabId;
+  label: string;
+  emptyMessage: string;
+  ariaLabel: string;
+  showTicketMeta: boolean;
+}> = [
   {
     id: 'tickets',
     label: 'Мои билеты',
@@ -85,7 +94,7 @@ const MY_TICKETS_TABS = [
     ariaLabel: 'Избранные события',
     showTicketMeta: false,
   },
-] as const;
+];
 
 interface UserTicketResponse {
   eventId: number;
@@ -107,6 +116,7 @@ interface MyTicketsEventListItem extends Event {
 }
 
 const route = useRoute();
+const router = useRouter();
 const buildTicketEventListItems = (
   tickets: UserTicketResponse[],
 ): MyTicketsEventListItem[] => {
@@ -162,13 +172,9 @@ const resolveRequestError = (error: unknown, fallbackMessage: string): string =>
 const sessionStore = useSessionStore();
 const { user } = storeToRefs(sessionStore);
 
-const resolveTabId = (queryTab: unknown): (typeof MY_TICKETS_TABS)[number]['id'] => (
-  queryTab === 'favorites' ? 'favorites' : 'tickets'
-);
-
-const activeTab = ref<(typeof MY_TICKETS_TABS)[number]['id']>(
-  resolveTabId(route.query.tab),
-);
+const activeTab = computed<MyTicketsTabId>(() => (
+  route.name === RouteName.MyFavorites ? 'favorites' : 'tickets'
+));
 const isLoading = ref(false);
 const errorMessage = ref('');
 
@@ -186,7 +192,7 @@ const syncFavoriteIdsToSession = (events: Event[]) => {
   };
 };
 
-const loadTabData = async (tab: string) => {
+const loadTabData = async (tab: MyTicketsTabId) => {
   isLoading.value = true;
   errorMessage.value = '';
 
@@ -208,16 +214,18 @@ const loadTabData = async (tab: string) => {
   }
 };
 
-watch(
-  () => route.query.tab,
-  (queryTab) => {
-    const nextTab = resolveTabId(queryTab);
+const setActiveTab = (tabId: MyTicketsTabId) => {
+  if (tabId === activeTab.value) {
+    return;
+  }
 
-    if (nextTab !== activeTab.value) {
-      activeTab.value = nextTab;
-    }
-  },
-);
+  const nextRouteName =
+    tabId === 'favorites' ? RouteName.MyFavorites : RouteName.MyTickets;
+
+  void router.push({
+    name: nextRouteName,
+  });
+};
 
 watch(
   activeTab,

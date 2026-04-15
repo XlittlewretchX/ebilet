@@ -3,5 +3,6 @@ export enum RouteName {
   Auth = 'auth',
   Profile = 'profile',
   MyTickets = 'my-tickets',
+  MyFavorites = 'my-favorites',
   BuyTicket = 'buy-ticket',
 }

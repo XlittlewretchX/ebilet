@@ -161,7 +161,7 @@
                 <button
                   type="button"
                   class="profile-page__button profile-page__button--secondary"
-                  @click="router.push({ name: RouteName.MyTickets, params: {} })"
+                  @click="router.push({ name: RouteName.MyTickets })"
                 >
                   Мои билеты
                 </button>
@@ -170,7 +170,7 @@
                 <button
                   type="button"
                   class="profile-page__button profile-page__button--secondary"
-                  @click="router.push({ name: RouteName.MyTickets, params: {}, query: { tab: 'favorites' } })"
+                  @click="router.push({ name: RouteName.MyFavorites })"
                 >
                   Избранное
                 </button>
